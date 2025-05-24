@@ -1,0 +1,1970 @@
+<?php
+if (!defined('ABSPATH')) exit;
+
+?>
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestion des Clients - SéfarPay Management</title>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary-color: #0054a6;
+            --primary-light: #1a6bc2;
+            --primary-dark: #00407d;
+            --secondary-color: #3aa7aa;
+            --secondary-light: #4dbdc0;
+            --secondary-dark: #2a8a8d;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #343a40;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--dark-gray);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg,
+                    var(--primary-color) 0%,
+                    var(--primary-light) 100%);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .page-header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: var(--white);
+            border-radius: 50% 50% 0 0;
+        }
+
+        .page-header h1 {
+            color: var(--white);
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .page-content {
+            padding: 20px 30px 40px;
+        }
+
+        /* Statistiques */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg,
+                    var(--primary-color),
+                    var(--secondary-color));
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .stat-pending .stat-icon {
+            background-color: var(--warning-color);
+        }
+
+        .stat-validated .stat-icon {
+            background-color: var(--success-color);
+        }
+
+        .stat-refused .stat-icon {
+            background-color: var(--error-color);
+        }
+
+        .stat-blocked .stat-icon {
+            background-color: var(--dark-gray);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Filtres */
+        .filters-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            background-color: var(--light-gray);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .filters-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .filters-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                    var(--primary-color),
+                    var(--secondary-color));
+            border-radius: 5px 0 0 5px;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-weight: 600;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .section-title i {
+            margin-right: 12px;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg,
+                    var(--primary-color),
+                    var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            flex: 1 1 200px;
+            position: relative;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-gray);
+            font-size: 0.95rem;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background-color: var(--white);
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 4px rgba(58, 167, 170, 0.15);
+        }
+
+        .filter-icon {
+            position: absolute;
+            left: 15px;
+            top: 40px;
+            color: #adb5bd;
+            transition: color 0.3s;
+        }
+
+        .filter-group:focus-within .filter-icon {
+            color: var(--primary-color);
+        }
+
+        .actions-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        .filter-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: linear-gradient(135deg,
+                    var(--secondary-color),
+                    var(--secondary-light));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(58, 167, 170, 0.2);
+            margin-right: 10px;
+        }
+
+        .filter-btn i {
+            margin-right: 8px;
+        }
+
+        .filter-btn:hover {
+            background: linear-gradient(135deg,
+                    var(--secondary-dark),
+                    var(--secondary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(58, 167, 170, 0.25);
+        }
+
+        .reset-btn {
+            background-color: #f8f9fa;
+            color: var(--dark-gray);
+            border: 1px solid #dee2e6;
+        }
+
+        .reset-btn:hover {
+            background-color: #e9ecef;
+        }
+
+        /* Tableau optimisé */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .clients-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--white);
+            font-size: 0.9rem;
+        }
+
+        .clients-table th {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 15px 12px;
+            text-align: left;
+            position: relative;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+
+        .clients-table th:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .clients-table th i {
+            margin-left: 5px;
+            font-size: 0.8rem;
+        }
+
+        .clients-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.3s;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        .clients-table tbody tr {
+            transition: all 0.3s;
+        }
+
+        .clients-table tbody tr:hover {
+            background-color: rgba(233, 236, 239, 0.3);
+        }
+
+        .clients-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Ligne de détails dépliable */
+        .details-row {
+            display: none;
+            background-color: var(--light-gray);
+        }
+
+        .details-row.expanded {
+            display: table-row;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .details-content {
+            padding: 25px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .detail-section {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-section h4 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .detail-section h4 i {
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+
+        .detail-item {
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #6c757d;
+            font-size: 0.85rem;
+            flex: 1;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            font-weight: 500;
+            flex: 2;
+            text-align: right;
+        }
+
+        /* Bouton de dépliage */
+        .expand-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+        }
+
+        .expand-btn:hover {
+            background-color: rgba(0, 84, 166, 0.1);
+            transform: scale(1.1);
+        }
+
+        .expand-btn.expanded {
+            transform: rotate(180deg);
+            background-color: rgba(0, 84, 166, 0.1);
+        }
+
+        /* Statuts */
+        .status {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .status i {
+            margin-right: 6px;
+            font-size: 0.75rem;
+        }
+
+        .status-pending {
+            background-color: rgba(243, 156, 18, 0.15);
+            color: var(--warning-color);
+        }
+
+        .status-validated {
+            background-color: rgba(46, 204, 113, 0.15);
+            color: var(--success-color);
+        }
+
+        .status-refused {
+            background-color: rgba(231, 76, 60, 0.15);
+            color: var(--error-color);
+        }
+
+        .status-blocked {
+            background-color: rgba(52, 58, 64, 0.15);
+            color: var(--dark-gray);
+        }
+
+        /* Boutons d'action */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+
+        .btn-validate {
+            background-color: var(--success-color);
+            color: var(--white);
+        }
+
+        .btn-validate:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-refuse {
+            background-color: var(--error-color);
+            color: var(--white);
+        }
+
+        .btn-refuse:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-toggle {
+            background-color: var(--warning-color);
+            color: var(--white);
+        }
+
+        .btn-toggle:hover {
+            background-color: #e67e22;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(243, 156, 18, 0.3);
+        }
+
+        /* Switch pour activation */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--success-color);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Document link */
+        .document-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .document-link:hover {
+            color: var(--primary-dark);
+        }
+
+        .document-link i {
+            margin-right: 6px;
+            font-size: 1rem;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .pagination-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            margin: 0 5px;
+            border-radius: 50%;
+            background-color: var(--white);
+            color: var(--dark-gray);
+            border: 1px solid #dee2e6;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pagination-btn:hover {
+            background-color: var(--light-gray);
+            border-color: #ced4da;
+        }
+
+        .pagination-btn.active {
+            background: linear-gradient(135deg,
+                    var(--primary-color),
+                    var(--primary-light));
+            color: var(--white);
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 84, 166, 0.2);
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 15px;
+            }
+
+            .page-header {
+                padding: 30px 20px;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .page-content {
+                padding: 15px 20px 30px;
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filters-section {
+                padding: 20px;
+            }
+
+            .filters-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .actions-row {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .filter-btn,
+            .reset-btn {
+                margin-right: 0;
+                justify-content: center;
+            }
+
+            .clients-table th,
+            .clients-table td {
+                padding: 10px 8px;
+                font-size: 0.8rem;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark-gray);
+            color: var(--white);
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+            font-weight: normal;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--dark-gray) transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>Gestion des Clients</h1>
+            <p>
+                Interface d'administration pour gérer les clients du plugin SéfarPay
+                Management
+            </p>
+        </div>
+
+        <div class="page-content">
+            <!-- Statistiques -->
+            <div class="stats-section">
+                <div class="stat-card stat-pending">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">En attente</div>
+                </div>
+
+                <div class="stat-card stat-validated">
+                    <div class="stat-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="stat-number">45</div>
+                    <div class="stat-label">Validés</div>
+                </div>
+
+                <div class="stat-card stat-refused">
+                    <div class="stat-icon">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Refusés</div>
+                </div>
+
+                <div class="stat-card stat-blocked">
+                    <div class="stat-icon">
+                        <i class="fas fa-ban"></i>
+                    </div>
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Bloqués</div>
+                </div>
+            </div>
+
+            <!-- Filtres -->
+            <div class="filters-section">
+                <h2 class="section-title">
+                    <i class="fas fa-filter"></i>Filtres et recherche
+                </h2>
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="status-filter">Statut</label>
+                        <i class="fas fa-check-circle filter-icon"></i>
+                        <select id="status-filter" class="filter-input">
+                            <option value="">Tous les statuts</option>
+                            <option value="pending">En attente</option>
+                            <option value="validated">Validé</option>
+                            <option value="refused">Refusé</option>
+                            <option value="blocked">Bloqué</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="activity-filter">Type d'activité</label>
+                        <i class="fas fa-briefcase filter-icon"></i>
+                        <select id="activity-filter" class="filter-input">
+                            <option value="">Tous les types</option>
+                            <option value="vente">
+                                Vente de biens / Prestation de services
+                            </option>
+                            <option value="public">Service public</option>
+                            <option value="informatique">Informatique</option>
+                            <option value="socio">Organisme socio-professionnel</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="search">Recherche</label>
+                        <i class="fas fa-search filter-icon"></i>
+                        <input
+                            type="text"
+                            id="search"
+                            class="filter-input"
+                            placeholder="Nom, email, raison sociale..." />
+                    </div>
+                </div>
+
+                <div class="actions-row">
+                    <div>
+                        <button id="apply-filters" class="filter-btn">
+                            <i class="fas fa-search"></i> Appliquer les filtres
+                        </button>
+                        <button id="reset-filters" class="filter-btn reset-btn">
+                            <i class="fas fa-undo"></i> Réinitialiser
+                        </button>
+                    </div>
+                    <div>
+                        <button id="export-csv" class="filter-btn">
+                            <i class="fas fa-file-csv"></i> Exporter CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tableau des clients optimisé -->
+            <div class="table-container">
+                <table class="clients-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px"></th>
+                            <th data-sort="nom"><i class="fas fa-sort"></i> Client</th>
+                            <th data-sort="email"><i class="fas fa-sort"></i> Email</th>
+                            <th data-sort="raison_sociale">
+                                <i class="fas fa-sort"></i> Entreprise
+                            </th>
+                            <th data-sort="type_activite">
+                                <i class="fas fa-sort"></i> Activité
+                            </th>
+                            <th data-sort="wilaya"><i class="fas fa-sort"></i> Wilaya</th>
+                            <th data-sort="statut"><i class="fas fa-sort"></i> Statut</th>
+                            <th data-sort="actif"><i class="fas fa-sort"></i> Actif</th>
+                            <th style="width: 200px">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clients-data">
+                        <!-- Client 1 -->
+                        <tr data-id="1">
+                            <td>
+                                <button class="expand-btn" onclick="toggleDetails(1)">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center">
+                                    <div
+                                        style="
+                        width: 40px;
+                        height: 40px;
+                        background: linear-gradient(
+                          135deg,
+                          var(--primary-color),
+                          var(--secondary-color)
+                        );
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: bold;
+                        margin-right: 12px;
+                      ">
+                                        AB
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--dark-gray)">
+                                            Ahmed Benali
+                                        </div>
+                                        <div style="font-size: 0.8rem; color: #6c757d">
+                                            M. • +213 555 123 456
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>ahmed.benali@email.com</td>
+                            <td>
+                                <div>
+                                    <div style="font-weight: 500">TechnoSoft SARL</div>
+                                    <div style="font-size: 0.8rem; color: #6c757d">
+                                        www.technosoft.dz
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Informatique</td>
+                            <td>Alger</td>
+                            <td>
+                                <span class="status status-validated"><i class="fas fa-check-circle"></i> Validé</span>
+                            </td>
+                            <td>
+                                <label class="switch">
+                                    <input type="checkbox" checked />
+                                    <span class="slider"></span>
+                                </label>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button
+                                        class="action-btn btn-validate tooltip"
+                                        style="background-color: var(--info-color)">
+                                        <i class="fas fa-file-pdf"></i> Doc
+                                        <span class="tooltip-text">Voir document</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne de détails pour client 1 -->
+                        <tr class="details-row" id="details-1">
+                            <td colspan="9">
+                                <div class="details-content">
+                                    <div class="details-grid">
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-user"></i> Informations personnelles
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Civilité:</span>
+                                                <span class="detail-value">Monsieur</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Nom complet:</span>
+                                                <span class="detail-value">Ahmed Benali</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Email personnel:</span>
+                                                <span class="detail-value">ahmed.benali@email.com</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Téléphone:</span>
+                                                <span class="detail-value">+213 555 123 456</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-building"></i> Informations
+                                                entreprise
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Raison sociale:</span>
+                                                <span class="detail-value">TechnoSoft SARL</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Email entreprise:</span>
+                                                <span class="detail-value">contact@technosoft.dz</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Tél. entreprise:</span>
+                                                <span class="detail-value">+213 21 123 456</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Site web:</span>
+                                                <span class="detail-value">www.technosoft.dz</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-map-marker-alt"></i> Localisation
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Adresse:</span>
+                                                <span class="detail-value">123 Rue des Entrepreneurs</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Wilaya:</span>
+                                                <span class="detail-value">Alger</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Commune:</span>
+                                                <span class="detail-value">Bab Ezzouar</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-briefcase"></i> Activité & Juridique
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Type d'activité:</span>
+                                                <span class="detail-value">Informatique</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Forme juridique:</span>
+                                                <span class="detail-value">SARL</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Date début:</span>
+                                                <span class="detail-value">15/03/2020</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">N° Registre:</span>
+                                                <span class="detail-value">20/00123456B20</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-university"></i> Informations
+                                                bancaires
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Banque:</span>
+                                                <span class="detail-value">BNA</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-file-alt"></i> Document & Statut
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Document:</span>
+                                                <span class="detail-value">
+                                                    <a href="#" class="document-link">
+                                                        <i class="fas fa-file-pdf"></i> Télécharger
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Statut:</span>
+                                                <span class="detail-value">
+                                                    <span class="status status-validated">
+                                                        <i class="fas fa-check-circle"></i> Validé
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Client 2 -->
+                        <tr data-id="2">
+                            <td>
+                                <button class="expand-btn" onclick="toggleDetails(2)">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center">
+                                    <div
+                                        style="
+                        width: 40px;
+                        height: 40px;
+                        background: linear-gradient(
+                          135deg,
+                          var(--secondary-color),
+                          var(--primary-color)
+                        );
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: bold;
+                        margin-right: 12px;
+                      ">
+                                        KH
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--dark-gray)">
+                                            Karima Hadj
+                                        </div>
+                                        <div style="font-size: 0.8rem; color: #6c757d">
+                                            Mme • +213 555 789 012
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>karima.hadj@email.com</td>
+                            <td>
+                                <div>
+                                    <div style="font-weight: 500">Mode & Style</div>
+                                    <div style="font-size: 0.8rem; color: #6c757d">
+                                        www.modestyle.dz
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Vente de biens</td>
+                            <td>Oran</td>
+                            <td>
+                                <span class="status status-pending"><i class="fas fa-clock"></i> En attente</span>
+                            </td>
+                            <td>
+                                <label class="switch">
+                                    <input type="checkbox" />
+                                    <span class="slider"></span>
+                                </label>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button
+                                        class="action-btn btn-validate"
+                                        onclick="validateClient(2)">
+                                        <i class="fas fa-check"></i> Valider
+                                    </button>
+                                    <button
+                                        class="action-btn btn-refuse"
+                                        onclick="refuseClient(2)">
+                                        <i class="fas fa-times"></i> Refuser
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne de détails pour client 2 -->
+                        <tr class="details-row" id="details-2">
+                            <td colspan="9">
+                                <div class="details-content">
+                                    <div class="details-grid">
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-user"></i> Informations personnelles
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Civilité:</span>
+                                                <span class="detail-value">Madame</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Nom complet:</span>
+                                                <span class="detail-value">Karima Hadj</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Email personnel:</span>
+                                                <span class="detail-value">karima.hadj@email.com</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Téléphone:</span>
+                                                <span class="detail-value">+213 555 789 012</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-building"></i> Informations
+                                                entreprise
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Raison sociale:</span>
+                                                <span class="detail-value">Mode & Style</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Email entreprise:</span>
+                                                <span class="detail-value">info@modestyle.dz</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Tél. entreprise:</span>
+                                                <span class="detail-value">+213 41 789 012</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Site web:</span>
+                                                <span class="detail-value">www.modestyle.dz</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-map-marker-alt"></i> Localisation
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Adresse:</span>
+                                                <span class="detail-value">45 Boulevard Mohamed V</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Wilaya:</span>
+                                                <span class="detail-value">Oran</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Commune:</span>
+                                                <span class="detail-value">Es Senia</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-briefcase"></i> Activité & Juridique
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Type d'activité:</span>
+                                                <span class="detail-value">Vente de biens / Prestation de services</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Forme juridique:</span>
+                                                <span class="detail-value">EURL</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Date début:</span>
+                                                <span class="detail-value">10/07/2021</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">N° Registre:</span>
+                                                <span class="detail-value">31/00789012B21</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-university"></i> Informations
+                                                bancaires
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Banque:</span>
+                                                <span class="detail-value">BEA</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-file-alt"></i> Document & Statut
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Document:</span>
+                                                <span class="detail-value">
+                                                    <a href="#" class="document-link">
+                                                        <i class="fas fa-file-pdf"></i> Télécharger
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Statut:</span>
+                                                <span class="detail-value">
+                                                    <span class="status status-pending">
+                                                        <i class="fas fa-clock"></i> En attente
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Client 3 -->
+                        <tr data-id="3">
+                            <td>
+                                <button class="expand-btn" onclick="toggleDetails(3)">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center">
+                                    <div
+                                        style="
+                        width: 40px;
+                        height: 40px;
+                        background: linear-gradient(
+                          135deg,
+                          var(--error-color),
+                          #c0392b
+                        );
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: bold;
+                        margin-right: 12px;
+                      ">
+                                        MK
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--dark-gray)">
+                                            Mohamed Kaci
+                                        </div>
+                                        <div style="font-size: 0.8rem; color: #6c757d">
+                                            M. • +213 555 456 789
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>mohamed.kaci@email.com</td>
+                            <td>
+                                <div>
+                                    <div style="font-weight: 500">ElectroMax SPA</div>
+                                    <div style="font-size: 0.8rem; color: #6c757d">
+                                        www.electromax.dz
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Vente de biens</td>
+                            <td>Constantine</td>
+                            <td>
+                                <span class="status status-refused"><i class="fas fa-times-circle"></i> Refusé</span>
+                            </td>
+                            <td>
+                                <label class="switch">
+                                    <input type="checkbox" />
+                                    <span class="slider"></span>
+                                </label>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button
+                                        class="action-btn btn-validate"
+                                        onclick="validateClient(3)">
+                                        <i class="fas fa-check"></i> Valider
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne de détails pour client 3 -->
+                        <tr class="details-row" id="details-3">
+                            <td colspan="9">
+                                <div class="details-content">
+                                    <div class="details-grid">
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-user"></i> Informations personnelles
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Civilité:</span>
+                                                <span class="detail-value">Monsieur</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Nom complet:</span>
+                                                <span class="detail-value">Mohamed Kaci</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Email personnel:</span>
+                                                <span class="detail-value">mohamed.kaci@email.com</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Téléphone:</span>
+                                                <span class="detail-value">+213 555 456 789</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-building"></i> Informations
+                                                entreprise
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Raison sociale:</span>
+                                                <span class="detail-value">ElectroMax SPA</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Email entreprise:</span>
+                                                <span class="detail-value">direction@electromax.dz</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Tél. entreprise:</span>
+                                                <span class="detail-value">+213 31 456 789</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Site web:</span>
+                                                <span class="detail-value">www.electromax.dz</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-map-marker-alt"></i> Localisation
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Adresse:</span>
+                                                <span class="detail-value">78 Zone Industrielle</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Wilaya:</span>
+                                                <span class="detail-value">Constantine</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Commune:</span>
+                                                <span class="detail-value">El Khroub</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-briefcase"></i> Activité & Juridique
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Type d'activité:</span>
+                                                <span class="detail-value">Vente de biens</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Forme juridique:</span>
+                                                <span class="detail-value">SPA</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Date début:</span>
+                                                <span class="detail-value">22/11/2019</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">N° Registre:</span>
+                                                <span class="detail-value">25/00456789B19</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-university"></i> Informations
+                                                bancaires
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Banque:</span>
+                                                <span class="detail-value">CPA</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-file-alt"></i> Document & Statut
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Document:</span>
+                                                <span class="detail-value">
+                                                    <a href="#" class="document-link">
+                                                        <i class="fas fa-file-pdf"></i> Télécharger
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Statut:</span>
+                                                <span class="detail-value">
+                                                    <span class="status status-refused">
+                                                        <i class="fas fa-times-circle"></i> Refusé
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Client 4 -->
+                        <tr data-id="4">
+                            <td>
+                                <button class="expand-btn" onclick="toggleDetails(4)">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center">
+                                    <div
+                                        style="
+                        width: 40px;
+                        height: 40px;
+                        background: linear-gradient(
+                          135deg,
+                          var(--warning-color),
+                          #e67e22
+                        );
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: bold;
+                        margin-right: 12px;
+                      ">
+                                        AF
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--dark-gray)">
+                                            Amina Ferhat
+                                        </div>
+                                        <div style="font-size: 0.8rem; color: #6c757d">
+                                            Mlle • +213 555 234 567
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>amina.ferhat@email.com</td>
+                            <td>
+                                <div>
+                                    <div style="font-weight: 500">BeautyLab START-UP</div>
+                                    <div style="font-size: 0.8rem; color: #6c757d">
+                                        www.beautylab.dz
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Prestation de services</td>
+                            <td>Tizi Ouzou</td>
+                            <td>
+                                <span class="status status-blocked"><i class="fas fa-ban"></i> Bloqué</span>
+                            </td>
+                            <td>
+                                <label class="switch">
+                                    <input type="checkbox" />
+                                    <span class="slider"></span>
+                                </label>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button
+                                        class="action-btn btn-toggle"
+                                        onclick="toggleBlock(4)">
+                                        <i class="fas fa-unlock"></i> Débloquer
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne de détails pour client 4 -->
+                        <tr class="details-row" id="details-4">
+                            <td colspan="9">
+                                <div class="details-content">
+                                    <div class="details-grid">
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-user"></i> Informations personnelles
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Civilité:</span>
+                                                <span class="detail-value">Mademoiselle</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Nom complet:</span>
+                                                <span class="detail-value">Amina Ferhat</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Email personnel:</span>
+                                                <span class="detail-value">amina.ferhat@email.com</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Téléphone:</span>
+                                                <span class="detail-value">+213 555 234 567</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-building"></i> Informations
+                                                entreprise
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Raison sociale:</span>
+                                                <span class="detail-value">BeautyLab START-UP</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Email entreprise:</span>
+                                                <span class="detail-value">hello@beautylab.dz</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Tél. entreprise:</span>
+                                                <span class="detail-value">+213 26 234 567</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Site web:</span>
+                                                <span class="detail-value">www.beautylab.dz</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-map-marker-alt"></i> Localisation
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Adresse:</span>
+                                                <span class="detail-value">12 Cité Universitaire</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Wilaya:</span>
+                                                <span class="detail-value">Tizi Ouzou</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Commune:</span>
+                                                <span class="detail-value">Tizi Ouzou</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-briefcase"></i> Activité & Juridique
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Type d'activité:</span>
+                                                <span class="detail-value">Prestation de services</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Forme juridique:</span>
+                                                <span class="detail-value">START-UP</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Date début:</span>
+                                                <span class="detail-value">05/09/2022</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">N° Registre:</span>
+                                                <span class="detail-value">15/00234567B22</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-university"></i> Informations
+                                                bancaires
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Banque:</span>
+                                                <span class="detail-value">BDL</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="detail-section">
+                                            <h4>
+                                                <i class="fas fa-file-alt"></i> Document & Statut
+                                            </h4>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Document:</span>
+                                                <span class="detail-value">
+                                                    <a href="#" class="document-link">
+                                                        <i class="fas fa-file-pdf"></i> Télécharger
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Statut:</span>
+                                                <span class="detail-value">
+                                                    <span class="status status-blocked">
+                                                        <i class="fas fa-ban"></i> Bloqué
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="pagination-btn" data-page="prev">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="pagination-btn active">1</button>
+                <button class="pagination-btn">2</button>
+                <button class="pagination-btn">3</button>
+                <button class="pagination-btn">4</button>
+                <button class="pagination-btn">5</button>
+                <button class="pagination-btn" data-page="next">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fonction pour déplier/replier les détails
+        function toggleDetails(clientId) {
+            const detailsRow = document.getElementById(`details-${clientId}`);
+            const expandBtn = document.querySelector(
+                `tr[data-id="${clientId}"] .expand-btn`
+            );
+            const icon = expandBtn.querySelector("i");
+
+            if (detailsRow.classList.contains("expanded")) {
+                detailsRow.classList.remove("expanded");
+                expandBtn.classList.remove("expanded");
+                icon.style.transform = "rotate(0deg)";
+            } else {
+                // Fermer tous les autres détails ouverts
+                document.querySelectorAll(".details-row.expanded").forEach((row) => {
+                    row.classList.remove("expanded");
+                });
+                document.querySelectorAll(".expand-btn.expanded").forEach((btn) => {
+                    btn.classList.remove("expanded");
+                    btn.querySelector("i").style.transform = "rotate(0deg)";
+                });
+
+                // Ouvrir les détails du client sélectionné
+                detailsRow.classList.add("expanded");
+                expandBtn.classList.add("expanded");
+                icon.style.transform = "rotate(180deg)";
+            }
+        }
+
+        function validateClient(clientId) {
+            if (confirm("Êtes-vous sûr de vouloir valider ce client ?")) {
+                const row = document.querySelector(`tr[data-id="${clientId}"]`);
+                const statusCell = row.querySelector(".status");
+                statusCell.innerHTML = '<i class="fas fa-check-circle"></i> Validé';
+                statusCell.className = "status status-validated";
+
+                // Mettre à jour les boutons d'action
+                const actionsCell = row.querySelector(".action-buttons");
+                actionsCell.innerHTML = `
+                    <button class="action-btn tooltip" style="background-color: var(--info-color);">
+                        <i class="fas fa-file-pdf"></i> Doc
+                        <span class="tooltip-text">Voir document</span>
+                    </button>
+                `;
+
+                // Mettre à jour le statut dans les détails si ils sont ouverts
+                const detailsRow = document.getElementById(`details-${clientId}`);
+                if (detailsRow && detailsRow.classList.contains("expanded")) {
+                    const statusInDetails = detailsRow.querySelector(".status");
+                    if (statusInDetails) {
+                        statusInDetails.innerHTML =
+                            '<i class="fas fa-check-circle"></i> Validé';
+                        statusInDetails.className = "status status-validated";
+                    }
+                }
+
+                alert("Client validé avec succès!");
+            }
+        }
+
+        function refuseClient(clientId) {
+            const reason = prompt("Raison du refus:");
+            if (reason) {
+                const row = document.querySelector(`tr[data-id="${clientId}"]`);
+                const statusCell = row.querySelector(".status");
+                statusCell.innerHTML = '<i class="fas fa-times-circle"></i> Refusé';
+                statusCell.className = "status status-refused";
+
+                // Mettre à jour les boutons d'action
+                const actionsCell = row.querySelector(".action-buttons");
+                actionsCell.innerHTML = `
+                    <button class="action-btn btn-validate" onclick="validateClient(${clientId})">
+                        <i class="fas fa-check"></i> Valider
+                    </button>
+                `;
+
+                // Mettre à jour le statut dans les détails si ils sont ouverts
+                const detailsRow = document.getElementById(`details-${clientId}`);
+                if (detailsRow && detailsRow.classList.contains("expanded")) {
+                    const statusInDetails = detailsRow.querySelector(".status");
+                    if (statusInDetails) {
+                        statusInDetails.innerHTML =
+                            '<i class="fas fa-times-circle"></i> Refusé';
+                        statusInDetails.className = "status status-refused";
+                    }
+                }
+
+                alert("Client refusé avec succès!");
+            }
+        }
+
+        function toggleBlock(clientId) {
+            const row = document.querySelector(`tr[data-id="${clientId}"]`);
+            const statusCell = row.querySelector(".status");
+            const isBlocked = statusCell.textContent.includes("Bloqué");
+
+            if (isBlocked) {
+                statusCell.innerHTML = '<i class="fas fa-check-circle"></i> Validé';
+                statusCell.className = "status status-validated";
+
+                // Mettre à jour le bouton
+                const actionsCell = row.querySelector(".action-buttons");
+                actionsCell.innerHTML = `
+                    <button class="action-btn tooltip" style="background-color: var(--info-color);">
+                        <i class="fas fa-file-pdf"></i> Doc
+                        <span class="tooltip-text">Voir document</span>
+                    </button>
+                `;
+
+                alert("Client débloqué avec succès!");
+            } else {
+                statusCell.innerHTML = '<i class="fas fa-ban"></i> Bloqué';
+                statusCell.className = "status status-blocked";
+
+                // Mettre à jour le bouton
+                const actionsCell = row.querySelector(".action-buttons");
+                actionsCell.innerHTML = `
+                    <button class="action-btn btn-toggle" onclick="toggleBlock(${clientId})">
+                        <i class="fas fa-unlock"></i> Débloquer
+                    </button>
+                `;
+
+                alert("Client bloqué avec succès!");
+            }
+
+            // Mettre à jour le statut dans les détails si ils sont ouverts
+            const detailsRow = document.getElementById(`details-${clientId}`);
+            if (detailsRow && detailsRow.classList.contains("expanded")) {
+                const statusInDetails = detailsRow.querySelector(".status");
+                if (statusInDetails) {
+                    statusInDetails.innerHTML = statusCell.innerHTML;
+                    statusInDetails.className = statusCell.className;
+                }
+            }
+        }
+
+        // Tri des colonnes
+        document
+            .querySelectorAll(".clients-table th[data-sort]")
+            .forEach((header) => {
+                header.addEventListener("click", function() {
+                    const sortBy = this.getAttribute("data-sort");
+                    const currentDirection =
+                        this.getAttribute("data-direction") || "asc";
+                    const newDirection = currentDirection === "asc" ? "desc" : "asc";
+
+                    // Réinitialiser toutes les directions de tri
+                    document
+                        .querySelectorAll(".clients-table th[data-sort]")
+                        .forEach((th) => {
+                            th.removeAttribute("data-direction");
+                            th.querySelector("i").className = "fas fa-sort";
+                        });
+
+                    // Définir la nouvelle direction de tri
+                    this.setAttribute("data-direction", newDirection);
+                    this.querySelector("i").className =
+                        newDirection === "asc" ? "fas fa-sort-up" : "fas fa-sort-down";
+
+                    alert(
+                        `Tri par ${sortBy} en ordre ${
+                newDirection === "asc" ? "croissant" : "décroissant"
+              }`
+                    );
+                });
+            });
+
+        // Filtres
+        document
+            .getElementById("apply-filters")
+            .addEventListener("click", function() {
+                const status = document.getElementById("status-filter").value;
+                const activity = document.getElementById("activity-filter").value;
+                const search = document.getElementById("search").value;
+
+                alert(
+                    `Filtres appliqués:\nStatut: ${status || "Tous"}\nActivité: ${
+              activity || "Tous"
+            }\nRecherche: ${search || "Aucune"}`
+                );
+            });
+
+        document
+            .getElementById("reset-filters")
+            .addEventListener("click", function() {
+                document.getElementById("status-filter").value = "";
+                document.getElementById("activity-filter").value = "";
+                document.getElementById("search").value = "";
+                alert("Filtres réinitialisés");
+            });
+
+        // Export CSV
+        document
+            .getElementById("export-csv")
+            .addEventListener("click", function() {
+                alert("Export CSV en cours...");
+            });
+
+        // Pagination
+        document.querySelectorAll(".pagination-btn").forEach((button) => {
+            if (!button.hasAttribute("data-page")) {
+                button.addEventListener("click", function() {
+                    document.querySelectorAll(".pagination-btn").forEach((btn) => {
+                        btn.classList.remove("active");
+                    });
+                    this.classList.add("active");
+                    alert(`Page ${this.textContent} chargée`);
+                });
+            }
+        });
+
+        // Gestion des switches d'activation
+        document.querySelectorAll(".switch input").forEach((switchInput) => {
+            switchInput.addEventListener("change", function() {
+                const row = this.closest("tr");
+                const clientId = row.getAttribute("data-id");
+                const isActive = this.checked;
+
+                alert(`Client ${clientId} ${isActive ? "activé" : "désactivé"}`);
+            });
+        });
+
+        // Fermer tous les détails ouverts quand on clique ailleurs
+        document.addEventListener("click", function(event) {
+            if (
+                !event.target.closest(".expand-btn") &&
+                !event.target.closest(".details-row")
+            ) {
+                // Optionnel: fermer automatiquement les détails ouverts
+                // Commenté pour permettre de garder les détails ouverts
+                /*
+                      document.querySelectorAll('.details-row.expanded').forEach(row => {
+                          row.classList.remove('expanded');
+                      });
+                      document.querySelectorAll('.expand-btn.expanded').forEach(btn => {
+                          btn.classList.remove('expanded');
+                          btn.querySelector('i').style.transform = 'rotate(0deg)';
+                      });
+                      */
+            }
+        });
+    </script>
+</body>
+
+</html>

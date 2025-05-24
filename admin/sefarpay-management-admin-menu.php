@@ -3,51 +3,53 @@ if (!defined('ABSPATH')) exit;
 
 function sefarpay_management_admin_menu()
 {
+    // Menu principal + sous-menu "Accueil"
     add_menu_page(
-        'Sefarpay Management',          // Titre de la page
-        'Sefarpay Management',          // Titre du menu
-        'manage_options',               // Capability
-        'sefarpay_management',          // Slug du menu
-        'sefarpay_management_page_accueil',  // Fonction pour afficher la page d'accueil
-        'dashicons-admin-generic',      // Icône du menu
-        25                             // Position
+        'Sefarpay Management',               // Titre de la page
+        'Sefarpay Management',               // Titre du menu
+        'manage_options',                    // Capability
+        'sefarpay_management',               // Slug
+        'sefarpay_management_page_accueil',  // Callback
+        'dashicons-admin-generic',           // Icône
+        25                                   // Position
     );
 
+    // Sous-menu "Clients"
     add_submenu_page(
-        'sefarpay_management',
-        'Utilisateurs',
-        'Utilisateurs',
-        'manage_options',
-        'sefarpay_management_utilisateurs',
-        'sefarpay_management_page_utilisateurs'
+        'sefarpay_management',               // Parent slug
+        'Clients',                           // Titre de la page
+        'Clients',                           // Titre du sous-menu
+        'manage_options',                    // Capability
+        'sefarpay_management_clients',       // Slug
+        'sefarpay_management_page_clients'   // Callback
     );
 
+    // Sous-menu "Paiements"
     add_submenu_page(
-        'sefarpay_management',
-        'Paiements',
-        'Paiements',
-        'manage_options',
-        'sefarpay_management_paiements',
-        'sefarpay_management_page_paiements'
+        'sefarpay_management',               // Parent slug
+        'Paiements',                         // Titre de la page
+        'Paiements',                         // Titre du sous-menu
+        'manage_options',                    // Capability
+        'sefarpay_management_paiements',     // Slug
+        'sefarpay_management_page_paiements' // Callback
     );
 }
 
 add_action('admin_menu', 'sefarpay_management_admin_menu');
 
-// Fonctions pour afficher les pages
+// Fonctions de rappel pour afficher les vues
 
 function sefarpay_management_page_accueil()
 {
-    echo '<h1>Bienvenue dans Sefarpay Management</h1>';
-    // Tu peux inclure une vue ou du code HTML ici
+    sefarpay_management_render_view('accueil.php'); // views/accueil.php
 }
 
-function sefarpay_management_page_utilisateurs()
+function sefarpay_management_page_clients()
 {
-    require_once SEFARPAY_MANAGEMENT_PATH . 'admin/page_utilisateurs.php';
+    sefarpay_management_render_view('clients.php'); // views/clients.php
 }
 
 function sefarpay_management_page_paiements()
 {
-    require_once SEFARPAY_MANAGEMENT_PATH . 'admin/page_paiements.php';
+    sefarpay_management_render_view('paiements.php'); // views/paiements.php
 }
