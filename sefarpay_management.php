@@ -13,6 +13,7 @@ define('SEFARPAY_MANAGEMENT_PATH', plugin_dir_path(__FILE__));
 // Inclure les fichiers nécessaires
 require_once SEFARPAY_MANAGEMENT_PATH . 'admin/sefarpay-management-admin-menu.php';
 require_once SEFARPAY_MANAGEMENT_PATH . 'admin/sefarpay-management-install.php';
+require_once SEFARPAY_MANAGEMENT_PATH . 'api.php';  // <-- Ajout ici
 
 // Notification à l’activation
 function sefarpay_management_activation_notice()
@@ -33,7 +34,7 @@ add_action('admin_notices', 'sefarpay_management_admin_notice');
 // Fonction d’activation : création des tables + notification
 function sefarpay_management_on_activation()
 {
-    sefarpay_management_create_tables(); // Fonction définie dans sefarpay-management-install.php
+    sefarpay_management_create_tables(); // Défini dans install.php
     set_transient('sefarpay_management_activation_notice', true, 5);
 }
 register_activation_hook(__FILE__, 'sefarpay_management_on_activation');
@@ -48,7 +49,3 @@ function sefarpay_management_render_view($filename)
         echo '<div class="notice notice-error"><p>Vue non trouvée : ' . esc_html($filename) . '</p></div>';
     }
 }
-
-// Autres fichiers à inclure (optionnel selon ton projet)
-// require_once SEFARPAY_MANAGEMENT_PATH . 'admin/sefarpay-management-form-handler.php';
-// require_once SEFARPAY_MANAGEMENT_PATH . 'admin/sefarpay-management-config-handler.php';
