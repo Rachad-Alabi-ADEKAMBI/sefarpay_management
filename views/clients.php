@@ -907,815 +907,179 @@
             </tr>
           </thead>
           <tbody id="clients-data">
-            <!-- Client 1 -->
-            <tr data-id="1">
-              <td>
-                <button class="expand-btn" onclick="toggleDetails(1)">
-                  <i class="fas fa-chevron-down"></i>
-                </button>
-              </td>
-              <td>
-                <div style="display: flex; align-items: center">
-                  <div
-                    style="
-                        width: 40px;
-                        height: 40px;
-                        background: linear-gradient(
-                          135deg,
-                          var(--primary-color),
-                          var(--secondary-color)
-                        );
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: white;
-                        font-weight: bold;
-                        margin-right: 12px;
-                      ">
-                    AB
+            <?php foreach ($clients as $client): ?>
+              <tr data-id="<?= esc_attr($client->id) ?>">
+                <td>
+                  <button class="expand-btn" onclick="toggleDetails(<?= esc_js($client->id) ?>)">
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                </td>
+                <td>
+                  <div style="display: flex; align-items: center">
+                    <div style="
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 12px;
+          ">
+                      <?= strtoupper(substr($client->nom, 0, 1)) . strtoupper(substr($client->prenom, 0, 1)) ?>
+                    </div>
+                    <div>
+                      <div style="font-weight: 600; color: var(--dark-gray)">
+                        <?= esc_html($client->nom . ' ' . $client->prenom) ?>
+                      </div>
+                      <div style="font-size: 0.8rem; color: #6c757d">
+                        <?= esc_html($client->civilite) ?> • <?= esc_html($client->telephone) ?>
+                      </div>
+                    </div>
                   </div>
+                </td>
+                <td><?= esc_html($client->email) ?></td>
+                <td>
                   <div>
-                    <div style="font-weight: 600; color: var(--dark-gray)">
-                      Ahmed Benali
-                    </div>
+                    <div style="font-weight: 500"><?= esc_html($client->raison_sociale) ?></div>
                     <div style="font-size: 0.8rem; color: #6c757d">
-                      M. • +213 555 123 456
+                      <?= esc_html($client->site_web) ?>
                     </div>
                   </div>
-                </div>
-              </td>
-              <td>ahmed.benali@email.com</td>
-              <td>
-                <div>
-                  <div style="font-weight: 500">TechnoSoft SARL</div>
-                  <div style="font-size: 0.8rem; color: #6c757d">
-                    www.technosoft.dz
+                </td>
+                <td><?= esc_html($client->type_activite) ?></td>
+                <td><?= esc_html($client->wilaya) ?></td>
+                <td>
+                  <span class="status <?= $client->statut == 'validé' ? 'status-validated' : 'status-pending' ?>">
+                    <i class="fas fa-check-circle"></i> <?= ucfirst($client->statut) ?>
+                  </span>
+                </td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" <?= $client->statut = 'actif' ? 'checked' : '' ?> />
+                    <span class="slider"></span>
+                  </label>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="action-btn btn-validate tooltip" style="background-color: var(--info-color)">
+                      <i class="fas fa-file-pdf"></i> Doc
+                      <span class="tooltip-text">Voir document</span>
+                    </button>
                   </div>
-                </div>
-              </td>
-              <td>Informatique</td>
-              <td>Alger</td>
-              <td>
-                <span class="status status-validated"><i class="fas fa-check-circle"></i> Validé</span>
-              </td>
-              <td>
-                <label class="switch">
-                  <input type="checkbox" checked />
-                  <span class="slider"></span>
-                </label>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button
-                    class="action-btn btn-validate tooltip"
-                    style="background-color: var(--info-color)">
-                    <i class="fas fa-file-pdf"></i> Doc
-                    <span class="tooltip-text">Voir document</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
+                </td>
+              </tr>
 
-            <!-- Ligne de détails pour client 1 -->
-            <tr class="details-row" id="details-1">
-              <td colspan="9">
-                <div class="details-content">
-                  <div class="details-grid">
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-user"></i> Informations personnelles
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Civilité:</span>
-                        <span class="detail-value">Monsieur</span>
+              <!-- Ligne de détails -->
+              <tr class="details-row" id="details-<?= esc_attr($client->id) ?>">
+                <td colspan="9">
+                  <div class="details-content">
+                    <div class="details-grid">
+                      <!-- Exemple de section -->
+                      <div class="detail-section">
+                        <h4><i class="fas fa-user"></i> Informations personnelles</h4>
+                        <div class="detail-item">
+                          <span class="detail-label">Civilité:</span>
+                          <span class="detail-value"><?= esc_html($client->civilite) ?></span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Nom complet:</span>
+                          <span class="detail-value"><?= esc_html($client->nom . ' ' . $client->prenom) ?></span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Email personnel:</span>
+                          <span class="detail-value"><?= esc_html($client->email) ?></span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Téléphone:</span>
+                          <span class="detail-value"><?= esc_html($client->telephone) ?></span>
+                        </div>
                       </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Nom complet:</span>
-                        <span class="detail-value">Ahmed Benali</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Email personnel:</span>
-                        <span class="detail-value">ahmed.benali@email.com</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Téléphone:</span>
-                        <span class="detail-value">+213 555 123 456</span>
-                      </div>
-                    </div>
 
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-building"></i> Informations
-                        entreprise
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Raison sociale:</span>
-                        <span class="detail-value">TechnoSoft SARL</span>
+                      <div class="detail-section">
+                        <h4><i class="fas fa-building"></i> Informations entreprise</h4>
+                        <div class="detail-item"><span class="detail-label">Raison sociale:</span><span class="detail-value"><?= esc_html($client->raison_sociale) ?></span></div>
+                        <div class="detail-item"><span class="detail-label">Email entreprise:</span><span class="detail-value"><?= esc_html($client->email_entreprise ?? '-') ?></span></div>
+                        <div class="detail-item"><span class="detail-label">Tél. entreprise:</span><span class="detail-value"><?= esc_html($client->tel_entreprise ?? '-') ?></span></div>
+                        <div class="detail-item"><span class="detail-label">Site web:</span><span class="detail-value"><?= esc_html($client->site_web) ?></span></div>
                       </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Email entreprise:</span>
-                        <span class="detail-value">contact@technosoft.dz</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Tél. entreprise:</span>
-                        <span class="detail-value">+213 21 123 456</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Site web:</span>
-                        <span class="detail-value">www.technosoft.dz</span>
-                      </div>
-                    </div>
 
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-map-marker-alt"></i> Localisation
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Adresse:</span>
-                        <span class="detail-value">123 Rue des Entrepreneurs</span>
+                      <div class="detail-section">
+                        <h4><i class="fas fa-map-marker-alt"></i> Localisation</h4>
+                        <div class="detail-item"><span class="detail-label">Adresse:</span><span class="detail-value"><?= esc_html($client->adresse ?? '-') ?></span></div>
+                        <div class="detail-item"><span class="detail-label">Wilaya:</span><span class="detail-value"><?= esc_html($client->wilaya) ?></span></div>
+                        <div class="detail-item"><span class="detail-label">Commune:</span><span class="detail-value"><?= esc_html($client->commune ?? '-') ?></span></div>
                       </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Wilaya:</span>
-                        <span class="detail-value">Alger</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Commune:</span>
-                        <span class="detail-value">Bab Ezzouar</span>
-                      </div>
-                    </div>
 
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-briefcase"></i> Activité & Juridique
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Type d'activité:</span>
-                        <span class="detail-value">Informatique</span>
+                      <div class="detail-section">
+                        <h4><i class="fas fa-briefcase"></i> Activité & Juridique</h4>
+                        <div class="detail-item"><span class="detail-label">Type d'activité:</span><span class="detail-value"><?= esc_html($client->type_activite) ?></span></div>
+                        <div class="detail-item"><span class="detail-label">Forme juridique:</span><span class="detail-value"><?= esc_html($client->forme_juridique ?? '-') ?></span></div>
+                        <div class="detail-item"><span class="detail-label">Date début:</span><span class="detail-value"><?= esc_html($client->date_debut ?? '-') ?></span></div>
+                        <div class="detail-item"><span class="detail-label">N° Registre:</span><span class="detail-value"><?= esc_html($client->registre_commerce ?? '-') ?></span></div>
                       </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Forme juridique:</span>
-                        <span class="detail-value">SARL</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Date début:</span>
-                        <span class="detail-value">15/03/2020</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">N° Registre:</span>
-                        <span class="detail-value">20/00123456B20</span>
-                      </div>
-                    </div>
 
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-university"></i> Informations
-                        bancaires
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Banque:</span>
-                        <span class="detail-value">BNA</span>
+                      <div class="detail-section">
+                        <h4><i class="fas fa-university"></i> Informations bancaires</h4>
+                        <div class="detail-item"><span class="detail-label">Banque:</span><span class="detail-value"><?= esc_html($client->banque ?? '-') ?></span></div>
                       </div>
-                    </div>
 
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-file-alt"></i> Document & Statut
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Document:</span>
-                        <span class="detail-value">
-                          <a href="#" class="document-link">
-                            <i class="fas fa-file-pdf"></i> Télécharger
-                          </a>
-                        </span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Statut:</span>
-                        <span class="detail-value">
-                          <span class="status status-validated">
-                            <i class="fas fa-check-circle"></i> Validé
+                      <div class="detail-section">
+                        <h4><i class="fas fa-file-alt"></i> Document & Statut</h4>
+                        <div class="detail-item">
+                          <span class="detail-label">Document:</span>
+                          <span class="detail-value">
+                            <?php if (!empty($client->document_url)): ?>
+                              <a href="<?= esc_url($client->document_url) ?>" class="document-link" target="_blank">
+                                <i class="fas fa-file-pdf"></i> Télécharger
+                              </a>
+                            <?php else: ?>
+                              <em>Aucun document</em>
+                            <?php endif; ?>
                           </span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </td>
-            </tr>
-
-            <!-- Client 2 -->
-            <tr data-id="2">
-              <td>
-                <button class="expand-btn" onclick="toggleDetails(2)">
-                  <i class="fas fa-chevron-down"></i>
-                </button>
-              </td>
-              <td>
-                <div style="display: flex; align-items: center">
-                  <div
-                    style="
-                        width: 40px;
-                        height: 40px;
-                        background: linear-gradient(
-                          135deg,
-                          var(--secondary-color),
-                          var(--primary-color)
-                        );
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: white;
-                        font-weight: bold;
-                        margin-right: 12px;
-                      ">
-                    KH
-                  </div>
-                  <div>
-                    <div style="font-weight: 600; color: var(--dark-gray)">
-                      Karima Hadj
-                    </div>
-                    <div style="font-size: 0.8rem; color: #6c757d">
-                      Mme • +213 555 789 012
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td>karima.hadj@email.com</td>
-              <td>
-                <div>
-                  <div style="font-weight: 500">Mode & Style</div>
-                  <div style="font-size: 0.8rem; color: #6c757d">
-                    www.modestyle.dz
-                  </div>
-                </div>
-              </td>
-              <td>Vente de biens</td>
-              <td>Oran</td>
-              <td>
-                <span class="status status-pending"><i class="fas fa-clock"></i> En attente</span>
-              </td>
-              <td>
-                <label class="switch">
-                  <input type="checkbox" />
-                  <span class="slider"></span>
-                </label>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button
-                    class="action-btn btn-validate"
-                    onclick="validateClient(2)">
-                    <i class="fas fa-check"></i> Valider
-                  </button>
-                  <button
-                    class="action-btn btn-refuse"
-                    onclick="refuseClient(2)">
-                    <i class="fas fa-times"></i> Refuser
-                  </button>
-                </div>
-              </td>
-            </tr>
-
-            <!-- Ligne de détails pour client 2 -->
-            <tr class="details-row" id="details-2">
-              <td colspan="9">
-                <div class="details-content">
-                  <div class="details-grid">
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-user"></i> Informations personnelles
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Civilité:</span>
-                        <span class="detail-value">Madame</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Nom complet:</span>
-                        <span class="detail-value">Karima Hadj</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Email personnel:</span>
-                        <span class="detail-value">karima.hadj@email.com</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Téléphone:</span>
-                        <span class="detail-value">+213 555 789 012</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-building"></i> Informations
-                        entreprise
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Raison sociale:</span>
-                        <span class="detail-value">Mode & Style</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Email entreprise:</span>
-                        <span class="detail-value">info@modestyle.dz</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Tél. entreprise:</span>
-                        <span class="detail-value">+213 41 789 012</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Site web:</span>
-                        <span class="detail-value">www.modestyle.dz</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-map-marker-alt"></i> Localisation
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Adresse:</span>
-                        <span class="detail-value">45 Boulevard Mohamed V</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Wilaya:</span>
-                        <span class="detail-value">Oran</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Commune:</span>
-                        <span class="detail-value">Es Senia</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-briefcase"></i> Activité & Juridique
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Type d'activité:</span>
-                        <span class="detail-value">Vente de biens / Prestation de services</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Forme juridique:</span>
-                        <span class="detail-value">EURL</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Date début:</span>
-                        <span class="detail-value">10/07/2021</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">N° Registre:</span>
-                        <span class="detail-value">31/00789012B21</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-university"></i> Informations
-                        bancaires
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Banque:</span>
-                        <span class="detail-value">BEA</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-file-alt"></i> Document & Statut
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Document:</span>
-                        <span class="detail-value">
-                          <a href="#" class="document-link">
-                            <i class="fas fa-file-pdf"></i> Télécharger
-                          </a>
-                        </span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Statut:</span>
-                        <span class="detail-value">
-                          <span class="status status-pending">
-                            <i class="fas fa-clock"></i> En attente
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Statut:</span>
+                          <span class="detail-value">
+                            <span class="status <?= $client->statut == 'validé' ? 'status-validated' : 'status-pending' ?>">
+                              <i class="fas fa-check-circle"></i> <?= ucfirst($client->statut) ?>
+                            </span>
                           </span>
-                        </span>
+                        </div>
                       </div>
                     </div>
+
+                    <!-- Ajoute les autres sections ici de la même façon, en te basant sur les colonnes de ta base -->
                   </div>
-                </div>
-              </td>
-            </tr>
-
-            <!-- Client 3 -->
-            <tr data-id="3">
-              <td>
-                <button class="expand-btn" onclick="toggleDetails(3)">
-                  <i class="fas fa-chevron-down"></i>
-                </button>
-              </td>
-              <td>
-                <div style="display: flex; align-items: center">
-                  <div
-                    style="
-                        width: 40px;
-                        height: 40px;
-                        background: linear-gradient(
-                          135deg,
-                          var(--error-color),
-                          #c0392b
-                        );
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: white;
-                        font-weight: bold;
-                        margin-right: 12px;
-                      ">
-                    MK
-                  </div>
-                  <div>
-                    <div style="font-weight: 600; color: var(--dark-gray)">
-                      Mohamed Kaci
-                    </div>
-                    <div style="font-size: 0.8rem; color: #6c757d">
-                      M. • +213 555 456 789
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td>mohamed.kaci@email.com</td>
-              <td>
-                <div>
-                  <div style="font-weight: 500">ElectroMax SPA</div>
-                  <div style="font-size: 0.8rem; color: #6c757d">
-                    www.electromax.dz
-                  </div>
-                </div>
-              </td>
-              <td>Vente de biens</td>
-              <td>Constantine</td>
-              <td>
-                <span class="status status-refused"><i class="fas fa-times-circle"></i> Refusé</span>
-              </td>
-              <td>
-                <label class="switch">
-                  <input type="checkbox" />
-                  <span class="slider"></span>
-                </label>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button
-                    class="action-btn btn-validate"
-                    onclick="validateClient(3)">
-                    <i class="fas fa-check"></i> Valider
-                  </button>
-                </div>
-              </td>
-            </tr>
-
-            <!-- Ligne de détails pour client 3 -->
-            <tr class="details-row" id="details-3">
-              <td colspan="9">
-                <div class="details-content">
-                  <div class="details-grid">
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-user"></i> Informations personnelles
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Civilité:</span>
-                        <span class="detail-value">Monsieur</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Nom complet:</span>
-                        <span class="detail-value">Mohamed Kaci</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Email personnel:</span>
-                        <span class="detail-value">mohamed.kaci@email.com</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Téléphone:</span>
-                        <span class="detail-value">+213 555 456 789</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-building"></i> Informations
-                        entreprise
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Raison sociale:</span>
-                        <span class="detail-value">ElectroMax SPA</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Email entreprise:</span>
-                        <span class="detail-value">direction@electromax.dz</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Tél. entreprise:</span>
-                        <span class="detail-value">+213 31 456 789</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Site web:</span>
-                        <span class="detail-value">www.electromax.dz</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-map-marker-alt"></i> Localisation
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Adresse:</span>
-                        <span class="detail-value">78 Zone Industrielle</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Wilaya:</span>
-                        <span class="detail-value">Constantine</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Commune:</span>
-                        <span class="detail-value">El Khroub</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-briefcase"></i> Activité & Juridique
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Type d'activité:</span>
-                        <span class="detail-value">Vente de biens</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Forme juridique:</span>
-                        <span class="detail-value">SPA</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Date début:</span>
-                        <span class="detail-value">22/11/2019</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">N° Registre:</span>
-                        <span class="detail-value">25/00456789B19</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-university"></i> Informations
-                        bancaires
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Banque:</span>
-                        <span class="detail-value">CPA</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-file-alt"></i> Document & Statut
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Document:</span>
-                        <span class="detail-value">
-                          <a href="#" class="document-link">
-                            <i class="fas fa-file-pdf"></i> Télécharger
-                          </a>
-                        </span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Statut:</span>
-                        <span class="detail-value">
-                          <span class="status status-refused">
-                            <i class="fas fa-times-circle"></i> Refusé
-                          </span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </td>
-            </tr>
-
-            <!-- Client 4 -->
-            <tr data-id="4">
-              <td>
-                <button class="expand-btn" onclick="toggleDetails(4)">
-                  <i class="fas fa-chevron-down"></i>
-                </button>
-              </td>
-              <td>
-                <div style="display: flex; align-items: center">
-                  <div
-                    style="
-                        width: 40px;
-                        height: 40px;
-                        background: linear-gradient(
-                          135deg,
-                          var(--warning-color),
-                          #e67e22
-                        );
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: white;
-                        font-weight: bold;
-                        margin-right: 12px;
-                      ">
-                    AF
-                  </div>
-                  <div>
-                    <div style="font-weight: 600; color: var(--dark-gray)">
-                      Amina Ferhat
-                    </div>
-                    <div style="font-size: 0.8rem; color: #6c757d">
-                      Mlle • +213 555 234 567
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td>amina.ferhat@email.com</td>
-              <td>
-                <div>
-                  <div style="font-weight: 500">BeautyLab START-UP</div>
-                  <div style="font-size: 0.8rem; color: #6c757d">
-                    www.beautylab.dz
-                  </div>
-                </div>
-              </td>
-              <td>Prestation de services</td>
-              <td>Tizi Ouzou</td>
-              <td>
-                <span class="status status-blocked"><i class="fas fa-ban"></i> Bloqué</span>
-              </td>
-              <td>
-                <label class="switch">
-                  <input type="checkbox" />
-                  <span class="slider"></span>
-                </label>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button
-                    class="action-btn btn-toggle"
-                    onclick="toggleBlock(4)">
-                    <i class="fas fa-unlock"></i> Débloquer
-                  </button>
-                </div>
-              </td>
-            </tr>
-
-            <!-- Ligne de détails pour client 4 -->
-            <tr class="details-row" id="details-4">
-              <td colspan="9">
-                <div class="details-content">
-                  <div class="details-grid">
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-user"></i> Informations personnelles
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Civilité:</span>
-                        <span class="detail-value">Mademoiselle</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Nom complet:</span>
-                        <span class="detail-value">Amina Ferhat</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Email personnel:</span>
-                        <span class="detail-value">amina.ferhat@email.com</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Téléphone:</span>
-                        <span class="detail-value">+213 555 234 567</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-building"></i> Informations
-                        entreprise
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Raison sociale:</span>
-                        <span class="detail-value">BeautyLab START-UP</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Email entreprise:</span>
-                        <span class="detail-value">hello@beautylab.dz</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Tél. entreprise:</span>
-                        <span class="detail-value">+213 26 234 567</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Site web:</span>
-                        <span class="detail-value">www.beautylab.dz</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-map-marker-alt"></i> Localisation
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Adresse:</span>
-                        <span class="detail-value">12 Cité Universitaire</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Wilaya:</span>
-                        <span class="detail-value">Tizi Ouzou</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Commune:</span>
-                        <span class="detail-value">Tizi Ouzou</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-briefcase"></i> Activité & Juridique
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Type d'activité:</span>
-                        <span class="detail-value">Prestation de services</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Forme juridique:</span>
-                        <span class="detail-value">START-UP</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Date début:</span>
-                        <span class="detail-value">05/09/2022</span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">N° Registre:</span>
-                        <span class="detail-value">15/00234567B22</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-university"></i> Informations
-                        bancaires
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Banque:</span>
-                        <span class="detail-value">BDL</span>
-                      </div>
-                    </div>
-
-                    <div class="detail-section">
-                      <h4>
-                        <i class="fas fa-file-alt"></i> Document & Statut
-                      </h4>
-                      <div class="detail-item">
-                        <span class="detail-label">Document:</span>
-                        <span class="detail-value">
-                          <a href="#" class="document-link">
-                            <i class="fas fa-file-pdf"></i> Télécharger
-                          </a>
-                        </span>
-                      </div>
-                      <div class="detail-item">
-                        <span class="detail-label">Statut:</span>
-                        <span class="detail-value">
-                          <span class="status status-blocked">
-                            <i class="fas fa-ban"></i> Bloqué
-                          </span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
       </div>
+      </td>
+      </tr>
+    <?php endforeach; ?>
+    </tbody>
 
-      <!-- Pagination -->
-      <div class="pagination">
-        <button class="pagination-btn" data-page="prev">
-          <i class="fas fa-chevron-left"></i>
-        </button>
-        <button class="pagination-btn active">1</button>
-        <button class="pagination-btn">2</button>
-        <button class="pagination-btn">3</button>
-        <button class="pagination-btn">4</button>
-        <button class="pagination-btn">5</button>
-        <button class="pagination-btn" data-page="next">
-          <i class="fas fa-chevron-right"></i>
-        </button>
-      </div>
+    </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <button class="pagination-btn" data-page="prev">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="pagination-btn active">1</button>
+      <button class="pagination-btn">2</button>
+      <button class="pagination-btn">3</button>
+      <button class="pagination-btn">4</button>
+      <button class="pagination-btn">5</button>
+      <button class="pagination-btn" data-page="next">
+        <i class="fas fa-chevron-right"></i>
+      </button>
     </div>
   </div>
+  </div>
+
+
 
   <script>
     // Fonction pour déplier/replier les détails

@@ -46,10 +46,24 @@ function sefarpay_management_page_accueil()
 
 function sefarpay_management_page_clients()
 {
-    sefarpay_management_render_view('clients.php'); // views/clients.php
+    global $wpdb;
+    $table_clients = $wpdb->prefix . 'sefarpay_clients';
+
+    // Récupération des clients
+    $clients = $wpdb->get_results("SELECT * FROM $table_clients");
+
+    // Passage à la vue
+    sefarpay_management_render_view('clients.php', ['clients' => $clients]);
 }
+
 
 function sefarpay_management_page_paiements()
 {
-    sefarpay_management_render_view('paiements.php'); // views/paiements.php
+    global $wpdb;
+    $table_paiements = $wpdb->prefix . 'sefarpay_paiements';
+
+    // Récupération des clients
+    $paiements = $wpdb->get_results("SELECT * FROM $table_paiements");
+
+    sefarpay_management_render_view('paiements.php', ['paiements' => $paiements]); // views/paiements.php
 }

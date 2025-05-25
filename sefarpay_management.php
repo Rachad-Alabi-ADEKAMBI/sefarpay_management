@@ -38,12 +38,13 @@ function sefarpay_management_on_activation()
     set_transient('sefarpay_management_activation_notice', true, 5);
 }
 register_activation_hook(__FILE__, 'sefarpay_management_on_activation');
-
-// Fonction pour inclure une vue depuis /views
-function sefarpay_management_render_view($filename)
+// Fonction pour inclure une vue depuis /views avec passage de variables
+function sefarpay_management_render_view($filename, $data = [])
 {
     $path = SEFARPAY_MANAGEMENT_PATH . 'views/' . $filename;
+
     if (file_exists($path)) {
+        extract($data); // rend les clés du tableau disponibles comme variables
         include $path;
     } else {
         echo '<div class="notice notice-error"><p>Vue non trouvée : ' . esc_html($filename) . '</p></div>';

@@ -103,3 +103,79 @@ add_action('rest_api_init', function () {
         'permission_callback' => '__return_true',
     ]);
 });
+
+
+//code pour l'ajout automatique des paiements
+function sefarpay_register_payment(WP_REST_Request $request)
+{
+    global $wpdb;
+    $table = $wpdb->prefix . 'sefarpay_paiements';
+    $data = $request->get_json_params();
+
+    $required_fields = ['numero_commande', 'montant', 'devise'];
+    $missing_fields = [];
+
+    foreach ($required_fields as $field) {
+        if (!isset($data[$field]) || trim($data[$field]) === '') {
+            $missing_fields[] = $field;
+        }
+    }
+
+    if (!empty($missing_fields)) {
+        return new WP_REST_Response([
+            'error' => 'Champs requis manquants.',
+            'missing_fields' => $missing_fields
+        ], 400);
+    }
+
+    $sanitized_data = [
+        'client_id' => sanitize_text_field($data['client_id'] ?? ''),
+        'numero_commande'     => sanitize_text_field($data['numero_commande']),
+        'montant_paye'             => floatval($data['montant']),
+        'devise'              => sanitize_text_field($data['devise']),
+        'nom_carte'           => sanitize_text_field($data['nom_carte'] ?? ''),
+        'pan'                 => sanitize_text_field($data['pan'] ?? ''),
+        'code_acceptation'    => sanitize_text_field($data['code_acceptation'] ?? ''),
+        'code_autorisation'   => sanitize_text_field($data['code_autorisation'] ?? ''),
+        'code_action'         => sanitize_text_field($data['code_action'] ?? ''),
+        'description_action'  => sanitize_text_field($data['description_action'] ?? ''),
+        'etat_paiement'       => sanitize_text_field($data['etat_paiement'] ?? ''),
+        'description'         => sanitize_text_field($data['description'] ?? '')
+    ];
+
+    $inserted = $wpdb->insert($table, $sanitized_data);
+
+    if ($inserted === false) {
+        $error_details = [
+            'message' => 'Erreur SQL lors de l’insertion dans la base de données.',
+            'wpdb_last_error' => $wpdb->last_error,
+            'wpdb_last_query' => $wpdb->last_query,
+            'table' => $table,
+            'data' => $sanitized_data
+        ];
+
+        error_log('SEFARPAY INSERT ERROR: ' . print_r($error_details, true)); // log dans debug.log
+
+        return new WP_REST_Response([
+            'error' => $error_details['message'],
+            'sql_error' => $error_details['wpdb_last_error'],
+            'requete_sql' => $error_details['wpdb_last_query'],
+            'table' => $error_details['table'],
+            'data_envoyee' => $error_details['data']
+        ], 500);
+    }
+
+    return new WP_REST_Response([
+        'success' => true,
+        'paiement_id' => $wpdb->insert_id
+    ], 201);
+}
+
+
+add_action('rest_api_init', function () {
+    register_rest_route('sefarpay_management/v1', '/new-payment', [
+        'methods' => 'POST',
+        'callback' => 'sefarpay_register_payment',
+        'permission_callback' => '__return_true',
+    ]);
+});
