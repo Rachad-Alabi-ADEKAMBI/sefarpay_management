@@ -26,26 +26,11 @@
       --white: #ffffff;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    }
-
     @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
-
-    body {
-      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-      color: var(--dark-gray);
-      line-height: 1.6;
-      min-height: 100vh;
-      padding: 40px 20px;
-    }
 
     .container {
       max-width: 1400px;
-      margin: 0 auto;
+      margin: 15px 5px auto 5px;
       background-color: var(--white);
       border-radius: 20px;
       box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);

@@ -41,6 +41,7 @@ add_action('admin_menu', 'sefarpay_management_admin_menu');
 
 function sefarpay_management_page_accueil()
 {
+
     sefarpay_management_render_view('accueil.php'); // views/accueil.php
 }
 
