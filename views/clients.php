@@ -8,6 +8,578 @@
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="page-header">
+      <h1>Gestion des Clients</h1>
+      <p>
+        Interface d'administration pour gérer les clients du plugin SéfarPay
+        Management
+      </p>
+    </div>
+
+    <div class="page-content">
+      <!-- Statistiques -->
+      <div class="stats-section">
+        <div class="stat-card stat-pending">
+          <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="stat-number">12</div>
+          <div class="stat-label">En attente</div>
+        </div>
+
+        <div class="stat-card stat-validated">
+          <div class="stat-icon">
+            <i class="fas fa-check"></i>
+          </div>
+          <div class="stat-number">45</div>
+          <div class="stat-label">Validés</div>
+        </div>
+
+        <div class="stat-card stat-refused">
+          <div class="stat-icon">
+            <i class="fas fa-times"></i>
+          </div>
+          <div class="stat-number">8</div>
+          <div class="stat-label">Refusés</div>
+        </div>
+
+        <div class="stat-card stat-blocked">
+          <div class="stat-icon">
+            <i class="fas fa-ban"></i>
+          </div>
+          <div class="stat-number">3</div>
+          <div class="stat-label">Bloqués</div>
+        </div>
+      </div>
+
+      <!-- Filtres -->
+      <div class="filters-section">
+        <h2 class="section-title">
+          <i class="fas fa-filter"></i>Filtres et recherche
+        </h2>
+        <div class="filters-row">
+          <div class="filter-group">
+            <label for="status-filter">Statut</label>
+            <i class="fas fa-check-circle filter-icon"></i>
+            <select id="status-filter" class="filter-input">
+              <option value="">Tous les statuts</option>
+              <option value="pending">En attente</option>
+              <option value="validated">Validé</option>
+              <option value="refused">Refusé</option>
+              <option value="blocked">Bloqué</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="activity-filter">Type d'activité</label>
+            <i class="fas fa-briefcase filter-icon"></i>
+            <select id="activity-filter" class="filter-input">
+              <option value="">Tous les types</option>
+              <option value="vente">
+                Vente de biens / Prestation de services
+              </option>
+              <option value="public">Service public</option>
+              <option value="informatique">Informatique</option>
+              <option value="socio">Organisme socio-professionnel</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="search">Recherche</label>
+            <i class="fas fa-search filter-icon"></i>
+            <input
+              type="text"
+              id="search"
+              class="filter-input"
+              placeholder="Nom, email, raison sociale..." />
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <div>
+            <button id="apply-filters" class="filter-btn">
+              <i class="fas fa-search"></i> Appliquer les filtres
+            </button>
+            <button id="reset-filters" class="filter-btn reset-btn">
+              <i class="fas fa-undo"></i> Réinitialiser
+            </button>
+          </div>
+          <div>
+            <button id="export-csv" class="filter-btn">
+              <i class="fas fa-file-csv"></i> Exporter CSV
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tableau des clients optimisé -->
+      <div class="table-container">
+        <table class="clients-table">
+          <thead>
+            <tr>
+              <th style="width: 50px"></th>
+              <th data-sort="nom"><i class="fas fa-sort"></i> Client</th>
+              <th data-sort="email"><i class="fas fa-sort"></i> Email</th>
+              <th data-sort="raison_sociale">
+                <i class="fas fa-sort"></i> Entreprise
+              </th>
+              <th data-sort="type_activite">
+                <i class="fas fa-sort"></i> Activité
+              </th>
+              <th data-sort="wilaya"><i class="fas fa-sort"></i> Wilaya</th>
+              <th data-sort="statut"><i class="fas fa-sort"></i> Statut</th>
+              <th data-sort="actif"><i class="fas fa-sort"></i> Actif</th>
+              <th style="width: 200px">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="clients-data">
+            <?php foreach ($clients as $client): ?>
+              <tr data-id="<?= esc_attr($client->id) ?>">
+                <td>
+                  <button class="expand-btn" onclick="toggleDetails(<?= esc_js($client->id) ?>)">
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                </td>
+                <td>
+                  <div style="display: flex; align-items: center">
+                    <div style="
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 12px;
+          ">
+                      <?= strtoupper(substr($client->nom, 0, 1)) . strtoupper(substr($client->prenom, 0, 1)) ?>
+                    </div>
+                    <div>
+                      <div style="font-weight: 600; color: var(--dark-gray)">
+                        <?= esc_html($client->nom . ' ' . $client->prenom) ?>
+                      </div>
+                      <div style="font-size: 0.8rem; color: #6c757d">
+                        <?= esc_html($client->civilite) ?> • <?= esc_html($client->telephone) ?>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td><?= esc_html($client->email) ?></td>
+                <td>
+                  <div>
+                    <div style="font-weight: 500"><?= esc_html($client->raison_sociale) ?></div>
+                    <div style="font-size: 0.8rem; color: #6c757d">
+                      <?= esc_html($client->site_web) ?>
+                    </div>
+                  </div>
+                </td>
+                <td><?= esc_html($client->type_activite) ?></td>
+                <td><?= esc_html($client->wilaya) ?></td>
+                <td>
+                  <span class="status <?= $client->statut == 'Actif' ? 'status-validated' : 'status-pending' ?>">
+                    <i class="fas fa-check-circle"></i> <?= ucfirst($client->statut) ?>
+                  </span>
+                </td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" class="toggle-client-status" data-id="<?= esc_attr($client->id) ?>" <?= $client->statut === 'Actif' ? 'checked' : '' ?>>
+                    <span class="slider"></span>
+                  </label>
+
+                  <script>
+                    document.querySelectorAll('.toggle-client-status').forEach(el => {
+                      el.addEventListener('change', () => {
+                        fetch('<?php echo esc_url(rest_url('sefarpay/v1/toggle-status')); ?>', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                              id: el.dataset.id,
+                              actif: el.checked ? 'Actif' : 'Inactif'
+                            })
+                          })
+                          .then(response => response.json())
+                          .then(data => {
+                            if (data.updated) {
+                              alert('Le statut du client a été modifié avec succès.');
+                            } else {
+                              alert('Une erreur est survenue lors de la mise à jour du statut.');
+                            }
+                          })
+                          .catch(error => {
+                            console.error('Erreur réseau ou serveur :', error);
+                            alert('Erreur lors de la requête. Veuillez réessayer.');
+                          });
+                      });
+                    });
+                  </script>
+
+
+
+
+
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="action-btn btn-validate tooltip" style="background-color: var(--info-color)">
+                      <i class="fas fa-file-pdf"></i> Doc
+                      <span class="tooltip-text">Voir document</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Ligne de détails -->
+              <tr class="details-row" id="details-<?= esc_attr($client->id) ?>">
+                <td colspan="9">
+                  <div class="details-content">
+                    <div class="details-grid">
+                      <!-- Exemple de section -->
+                      <div class="detail-section">
+                        <h4><i class="fas fa-user"></i> Informations personnelles</h4>
+                        <div class="detail-item">
+                          <span class="detail-label">Civilité:</span>
+                          <span class="detail-value"><?= esc_html($client->civilite) ?></span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Nom complet:</span>
+                          <span class="detail-value"><?= esc_html($client->nom . ' ' . $client->prenom) ?></span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Email personnel:</span>
+                          <span class="detail-value"><?= esc_html($client->email) ?></span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Téléphone:</span>
+                          <span class="detail-value"><?= esc_html($client->telephone) ?></span>
+                        </div>
+                      </div>
+
+                      <div class="detail-section">
+                        <h4><i class="fas fa-building"></i> Informations entreprise</h4>
+                        <div class="detail-item"><span class="detail-label">Raison sociale:</span><span class="detail-value"><?= esc_html($client->raison_sociale) ?></span></div>
+                        <div class="detail-item"><span class="detail-label">Email entreprise:</span><span class="detail-value"><?= esc_html($client->email_entreprise ?? '-') ?></span></div>
+                        <div class="detail-item"><span class="detail-label">Tél. entreprise:</span><span class="detail-value"><?= esc_html($client->tel_entreprise ?? '-') ?></span></div>
+                        <div class="detail-item"><span class="detail-label">Site web:</span><span class="detail-value"><?= esc_html($client->site_web) ?></span></div>
+                      </div>
+
+                      <div class="detail-section">
+                        <h4><i class="fas fa-map-marker-alt"></i> Localisation</h4>
+                        <div class="detail-item"><span class="detail-label">Adresse:</span><span class="detail-value"><?= esc_html($client->adresse ?? '-') ?></span></div>
+                        <div class="detail-item"><span class="detail-label">Wilaya:</span><span class="detail-value"><?= esc_html($client->wilaya) ?></span></div>
+                        <div class="detail-item"><span class="detail-label">Commune:</span><span class="detail-value"><?= esc_html($client->commune ?? '-') ?></span></div>
+                      </div>
+
+                      <div class="detail-section">
+                        <h4><i class="fas fa-briefcase"></i> Activité & Juridique</h4>
+                        <div class="detail-item"><span class="detail-label">Type d'activité:</span><span class="detail-value"><?= esc_html($client->type_activite) ?></span></div>
+                        <div class="detail-item"><span class="detail-label">Forme juridique:</span><span class="detail-value"><?= esc_html($client->forme_juridique ?? '-') ?></span></div>
+                        <div class="detail-item"><span class="detail-label">Date début:</span><span class="detail-value"><?= esc_html($client->date_debut ?? '-') ?></span></div>
+                        <div class="detail-item"><span class="detail-label">N° Registre:</span><span class="detail-value"><?= esc_html($client->registre_commerce ?? '-') ?></span></div>
+                      </div>
+
+                      <div class="detail-section">
+                        <h4><i class="fas fa-university"></i> Informations bancaires</h4>
+                        <div class="detail-item"><span class="detail-label">Banque:</span><span class="detail-value"><?= esc_html($client->banque ?? '-') ?></span></div>
+                      </div>
+
+                      <div class="detail-section">
+                        <h4><i class="fas fa-file-alt"></i> Document & Statut</h4>
+                        <div class="detail-item">
+                          <span class="detail-label">Document:</span>
+                          <span class="detail-value">
+                            <?php if (!empty($client->document_url)): ?>
+                              <a href="<?= esc_url($client->document_url) ?>" class="document-link" target="_blank">
+                                <i class="fas fa-file-pdf"></i> Télécharger
+                              </a>
+                            <?php else: ?>
+                              <em>Aucun document</em>
+                            <?php endif; ?>
+                          </span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Statut:</span>
+                          <span class="detail-value">
+                            <span class="status <?= $client->statut == 'validé' ? 'status-validated' : 'status-pending' ?>">
+                              <i class="fas fa-check-circle"></i> <?= ucfirst($client->statut) ?>
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Ajoute les autres sections ici de la même façon, en te basant sur les colonnes de ta base -->
+                  </div>
+      </div>
+      </td>
+      </tr>
+    <?php endforeach; ?>
+    </tbody>
+
+    </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <button class="pagination-btn" data-page="prev">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="pagination-btn active">1</button>
+      <button class="pagination-btn">2</button>
+      <button class="pagination-btn">3</button>
+      <button class="pagination-btn">4</button>
+      <button class="pagination-btn">5</button>
+      <button class="pagination-btn" data-page="next">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+  </div>
+
+
+  <script>
+    // Fonction pour déplier/replier les détails
+    function toggleDetails(clientId) {
+      const detailsRow = document.getElementById(`details-${clientId}`);
+      const expandBtn = document.querySelector(
+        `tr[data-id="${clientId}"] .expand-btn`
+      );
+      const icon = expandBtn.querySelector("i");
+
+      if (detailsRow.classList.contains("expanded")) {
+        detailsRow.classList.remove("expanded");
+        expandBtn.classList.remove("expanded");
+        icon.style.transform = "rotate(0deg)";
+      } else {
+        // Fermer tous les autres détails ouverts
+        document.querySelectorAll(".details-row.expanded").forEach((row) => {
+          row.classList.remove("expanded");
+        });
+        document.querySelectorAll(".expand-btn.expanded").forEach((btn) => {
+          btn.classList.remove("expanded");
+          btn.querySelector("i").style.transform = "rotate(0deg)";
+        });
+
+        // Ouvrir les détails du client sélectionné
+        detailsRow.classList.add("expanded");
+        expandBtn.classList.add("expanded");
+        icon.style.transform = "rotate(180deg)";
+      }
+    }
+
+    function validateClient(clientId) {
+      if (confirm("Êtes-vous sûr de vouloir valider ce client ?")) {
+        const row = document.querySelector(`tr[data-id="${clientId}"]`);
+        const statusCell = row.querySelector(".status");
+        statusCell.innerHTML = '<i class="fas fa-check-circle"></i> Validé';
+        statusCell.className = "status status-validated";
+
+        // Mettre à jour les boutons d'action
+        const actionsCell = row.querySelector(".action-buttons");
+        actionsCell.innerHTML = `
+                    <button class="action-btn tooltip" style="background-color: var(--info-color);">
+                        <i class="fas fa-file-pdf"></i> Doc
+                        <span class="tooltip-text">Voir document</span>
+                    </button>
+                `;
+
+        // Mettre à jour le statut dans les détails si ils sont ouverts
+        const detailsRow = document.getElementById(`details-${clientId}`);
+        if (detailsRow && detailsRow.classList.contains("expanded")) {
+          const statusInDetails = detailsRow.querySelector(".status");
+          if (statusInDetails) {
+            statusInDetails.innerHTML =
+              '<i class="fas fa-check-circle"></i> Validé';
+            statusInDetails.className = "status status-validated";
+          }
+        }
+
+        alert("Client validé avec succès!");
+      }
+    }
+
+    function refuseClient(clientId) {
+      const reason = prompt("Raison du refus:");
+      if (reason) {
+        const row = document.querySelector(`tr[data-id="${clientId}"]`);
+        const statusCell = row.querySelector(".status");
+        statusCell.innerHTML = '<i class="fas fa-times-circle"></i> Refusé';
+        statusCell.className = "status status-refused";
+
+        // Mettre à jour les boutons d'action
+        const actionsCell = row.querySelector(".action-buttons");
+        actionsCell.innerHTML = `
+                    <button class="action-btn btn-validate" onclick="validateClient(${clientId})">
+                        <i class="fas fa-check"></i> Valider
+                    </button>
+                `;
+
+        // Mettre à jour le statut dans les détails si ils sont ouverts
+        const detailsRow = document.getElementById(`details-${clientId}`);
+        if (detailsRow && detailsRow.classList.contains("expanded")) {
+          const statusInDetails = detailsRow.querySelector(".status");
+          if (statusInDetails) {
+            statusInDetails.innerHTML =
+              '<i class="fas fa-times-circle"></i> Refusé';
+            statusInDetails.className = "status status-refused";
+          }
+        }
+
+        alert("Client refusé avec succès!");
+      }
+    }
+
+    function toggleBlock(clientId) {
+      const row = document.querySelector(`tr[data-id="${clientId}"]`);
+      const statusCell = row.querySelector(".status");
+      const isBlocked = statusCell.textContent.includes("Bloqué");
+
+      if (isBlocked) {
+        statusCell.innerHTML = '<i class="fas fa-check-circle"></i> Validé';
+        statusCell.className = "status status-validated";
+
+        // Mettre à jour le bouton
+        const actionsCell = row.querySelector(".action-buttons");
+        actionsCell.innerHTML = `
+                    <button class="action-btn tooltip" style="background-color: var(--info-color);">
+                        <i class="fas fa-file-pdf"></i> Doc
+                        <span class="tooltip-text">Voir document</span>
+                    </button>
+                `;
+
+        alert("Client débloqué avec succès!");
+      } else {
+        statusCell.innerHTML = '<i class="fas fa-ban"></i> Bloqué';
+        statusCell.className = "status status-blocked";
+
+        // Mettre à jour le bouton
+        const actionsCell = row.querySelector(".action-buttons");
+        actionsCell.innerHTML = `
+                    <button class="action-btn btn-toggle" onclick="toggleBlock(${clientId})">
+                        <i class="fas fa-unlock"></i> Débloquer
+                    </button>
+                `;
+
+        alert("Client bloqué avec succès!");
+      }
+
+      // Mettre à jour le statut dans les détails si ils sont ouverts
+      const detailsRow = document.getElementById(`details-${clientId}`);
+      if (detailsRow && detailsRow.classList.contains("expanded")) {
+        const statusInDetails = detailsRow.querySelector(".status");
+        if (statusInDetails) {
+          statusInDetails.innerHTML = statusCell.innerHTML;
+          statusInDetails.className = statusCell.className;
+        }
+      }
+    }
+
+    // Tri des colonnes
+    document
+      .querySelectorAll(".clients-table th[data-sort]")
+      .forEach((header) => {
+        header.addEventListener("click", function() {
+          const sortBy = this.getAttribute("data-sort");
+          const currentDirection =
+            this.getAttribute("data-direction") || "asc";
+          const newDirection = currentDirection === "asc" ? "desc" : "asc";
+
+          // Réinitialiser toutes les directions de tri
+          document
+            .querySelectorAll(".clients-table th[data-sort]")
+            .forEach((th) => {
+              th.removeAttribute("data-direction");
+              th.querySelector("i").className = "fas fa-sort";
+            });
+
+          // Définir la nouvelle direction de tri
+          this.setAttribute("data-direction", newDirection);
+          this.querySelector("i").className =
+            newDirection === "asc" ? "fas fa-sort-up" : "fas fa-sort-down";
+
+          alert(
+            `Tri par ${sortBy} en ordre ${
+                newDirection === "asc" ? "croissant" : "décroissant"
+              }`
+          );
+        });
+      });
+
+    // Filtres
+    document
+      .getElementById("apply-filters")
+      .addEventListener("click", function() {
+        const status = document.getElementById("status-filter").value;
+        const activity = document.getElementById("activity-filter").value;
+        const search = document.getElementById("search").value;
+
+        alert(
+          `Filtres appliqués:\nStatut: ${status || "Tous"}\nActivité: ${
+              activity || "Tous"
+            }\nRecherche: ${search || "Aucune"}`
+        );
+      });
+
+    document
+      .getElementById("reset-filters")
+      .addEventListener("click", function() {
+        document.getElementById("status-filter").value = "";
+        document.getElementById("activity-filter").value = "";
+        document.getElementById("search").value = "";
+        alert("Filtres réinitialisés");
+      });
+
+    // Export CSV
+    document
+      .getElementById("export-csv")
+      .addEventListener("click", function() {
+        alert("Export CSV en cours...");
+      });
+
+    // Pagination
+    document.querySelectorAll(".pagination-btn").forEach((button) => {
+      if (!button.hasAttribute("data-page")) {
+        button.addEventListener("click", function() {
+          document.querySelectorAll(".pagination-btn").forEach((btn) => {
+            btn.classList.remove("active");
+          });
+          this.classList.add("active");
+          alert(`Page ${this.textContent} chargée`);
+        });
+      }
+    });
+
+
+
+    // Fermer tous les détails ouverts quand on clique ailleurs
+    document.addEventListener("click", function(event) {
+      if (
+        !event.target.closest(".expand-btn") &&
+        !event.target.closest(".details-row")
+      ) {
+        // Optionnel: fermer automatiquement les détails ouverts
+        // Commenté pour permettre de garder les détails ouverts
+        /*
+              document.querySelectorAll('.details-row.expanded').forEach(row => {
+                  row.classList.remove('expanded');
+              });
+              document.querySelectorAll('.expand-btn.expanded').forEach(btn => {
+                  btn.classList.remove('expanded');
+                  btn.querySelector('i').style.transform = 'rotate(0deg)';
+              });
+              */
+      }
+    });
+  </script>
+
   <style>
     :root {
       --primary-color: #0054a6;
@@ -30,7 +602,7 @@
 
     .container {
       max-width: 1400px;
-      margin: 15px 5px auto 5px;
+      margin: 30px;
       background-color: var(--white);
       border-radius: 20px;
       box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
@@ -763,572 +1335,6 @@
       opacity: 1;
     }
   </style>
-</head>
-
-<body>
-  <div class="container">
-    <div class="page-header">
-      <h1>Gestion des Clients</h1>
-      <p>
-        Interface d'administration pour gérer les clients du plugin SéfarPay
-        Management
-      </p>
-    </div>
-
-    <div class="page-content">
-      <!-- Statistiques -->
-      <div class="stats-section">
-        <div class="stat-card stat-pending">
-          <div class="stat-icon">
-            <i class="fas fa-clock"></i>
-          </div>
-          <div class="stat-number">12</div>
-          <div class="stat-label">En attente</div>
-        </div>
-
-        <div class="stat-card stat-validated">
-          <div class="stat-icon">
-            <i class="fas fa-check"></i>
-          </div>
-          <div class="stat-number">45</div>
-          <div class="stat-label">Validés</div>
-        </div>
-
-        <div class="stat-card stat-refused">
-          <div class="stat-icon">
-            <i class="fas fa-times"></i>
-          </div>
-          <div class="stat-number">8</div>
-          <div class="stat-label">Refusés</div>
-        </div>
-
-        <div class="stat-card stat-blocked">
-          <div class="stat-icon">
-            <i class="fas fa-ban"></i>
-          </div>
-          <div class="stat-number">3</div>
-          <div class="stat-label">Bloqués</div>
-        </div>
-      </div>
-
-      <!-- Filtres -->
-      <div class="filters-section">
-        <h2 class="section-title">
-          <i class="fas fa-filter"></i>Filtres et recherche
-        </h2>
-        <div class="filters-row">
-          <div class="filter-group">
-            <label for="status-filter">Statut</label>
-            <i class="fas fa-check-circle filter-icon"></i>
-            <select id="status-filter" class="filter-input">
-              <option value="">Tous les statuts</option>
-              <option value="pending">En attente</option>
-              <option value="validated">Validé</option>
-              <option value="refused">Refusé</option>
-              <option value="blocked">Bloqué</option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="activity-filter">Type d'activité</label>
-            <i class="fas fa-briefcase filter-icon"></i>
-            <select id="activity-filter" class="filter-input">
-              <option value="">Tous les types</option>
-              <option value="vente">
-                Vente de biens / Prestation de services
-              </option>
-              <option value="public">Service public</option>
-              <option value="informatique">Informatique</option>
-              <option value="socio">Organisme socio-professionnel</option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="search">Recherche</label>
-            <i class="fas fa-search filter-icon"></i>
-            <input
-              type="text"
-              id="search"
-              class="filter-input"
-              placeholder="Nom, email, raison sociale..." />
-          </div>
-        </div>
-
-        <div class="actions-row">
-          <div>
-            <button id="apply-filters" class="filter-btn">
-              <i class="fas fa-search"></i> Appliquer les filtres
-            </button>
-            <button id="reset-filters" class="filter-btn reset-btn">
-              <i class="fas fa-undo"></i> Réinitialiser
-            </button>
-          </div>
-          <div>
-            <button id="export-csv" class="filter-btn">
-              <i class="fas fa-file-csv"></i> Exporter CSV
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tableau des clients optimisé -->
-      <div class="table-container">
-        <table class="clients-table">
-          <thead>
-            <tr>
-              <th style="width: 50px"></th>
-              <th data-sort="nom"><i class="fas fa-sort"></i> Client</th>
-              <th data-sort="email"><i class="fas fa-sort"></i> Email</th>
-              <th data-sort="raison_sociale">
-                <i class="fas fa-sort"></i> Entreprise
-              </th>
-              <th data-sort="type_activite">
-                <i class="fas fa-sort"></i> Activité
-              </th>
-              <th data-sort="wilaya"><i class="fas fa-sort"></i> Wilaya</th>
-              <th data-sort="statut"><i class="fas fa-sort"></i> Statut</th>
-              <th data-sort="actif"><i class="fas fa-sort"></i> Actif</th>
-              <th style="width: 200px">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="clients-data">
-            <?php foreach ($clients as $client): ?>
-              <tr data-id="<?= esc_attr($client->id) ?>">
-                <td>
-                  <button class="expand-btn" onclick="toggleDetails(<?= esc_js($client->id) ?>)">
-                    <i class="fas fa-chevron-down"></i>
-                  </button>
-                </td>
-                <td>
-                  <div style="display: flex; align-items: center">
-                    <div style="
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            margin-right: 12px;
-          ">
-                      <?= strtoupper(substr($client->nom, 0, 1)) . strtoupper(substr($client->prenom, 0, 1)) ?>
-                    </div>
-                    <div>
-                      <div style="font-weight: 600; color: var(--dark-gray)">
-                        <?= esc_html($client->nom . ' ' . $client->prenom) ?>
-                      </div>
-                      <div style="font-size: 0.8rem; color: #6c757d">
-                        <?= esc_html($client->civilite) ?> • <?= esc_html($client->telephone) ?>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td><?= esc_html($client->email) ?></td>
-                <td>
-                  <div>
-                    <div style="font-weight: 500"><?= esc_html($client->raison_sociale) ?></div>
-                    <div style="font-size: 0.8rem; color: #6c757d">
-                      <?= esc_html($client->site_web) ?>
-                    </div>
-                  </div>
-                </td>
-                <td><?= esc_html($client->type_activite) ?></td>
-                <td><?= esc_html($client->wilaya) ?></td>
-                <td>
-                  <span class="status <?= $client->statut == 'validé' ? 'status-validated' : 'status-pending' ?>">
-                    <i class="fas fa-check-circle"></i> <?= ucfirst($client->statut) ?>
-                  </span>
-                </td>
-                <td>
-                  <label class="switch">
-                    <input type="checkbox"
-                      class="toggle-client-status"
-                      data-id="<?= esc_attr($client->id) ?>"
-                      <?= $client->statut === 'actif' ? 'checked' : '' ?> />
-                    <span class="slider"></span>
-                  </label>
-
-                  <script>
-                    jQuery(document).ready(function($) {
-                      $('.toggle-client-status').on('change', function() {
-                        const clientId = $(this).data('id');
-                        const isChecked = $(this).is(':checked');
-                        const action = isChecked ? 'activer_client' : 'desactiver_client';
-
-                        $.ajax({
-                          url: ajaxurl,
-                          method: 'POST',
-                          data: {
-                            action: action,
-                            client_id: clientId
-                          },
-                          success: function(response) {
-                            console.log(response.message);
-                          },
-                          error: function() {
-                            alert('Une erreur est survenue.');
-                          }
-                        });
-                      });
-                    });
-                  </script>
-
-                </td>
-                <td>
-                  <div class="action-buttons">
-                    <button class="action-btn btn-validate tooltip" style="background-color: var(--info-color)">
-                      <i class="fas fa-file-pdf"></i> Doc
-                      <span class="tooltip-text">Voir document</span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- Ligne de détails -->
-              <tr class="details-row" id="details-<?= esc_attr($client->id) ?>">
-                <td colspan="9">
-                  <div class="details-content">
-                    <div class="details-grid">
-                      <!-- Exemple de section -->
-                      <div class="detail-section">
-                        <h4><i class="fas fa-user"></i> Informations personnelles</h4>
-                        <div class="detail-item">
-                          <span class="detail-label">Civilité:</span>
-                          <span class="detail-value"><?= esc_html($client->civilite) ?></span>
-                        </div>
-                        <div class="detail-item">
-                          <span class="detail-label">Nom complet:</span>
-                          <span class="detail-value"><?= esc_html($client->nom . ' ' . $client->prenom) ?></span>
-                        </div>
-                        <div class="detail-item">
-                          <span class="detail-label">Email personnel:</span>
-                          <span class="detail-value"><?= esc_html($client->email) ?></span>
-                        </div>
-                        <div class="detail-item">
-                          <span class="detail-label">Téléphone:</span>
-                          <span class="detail-value"><?= esc_html($client->telephone) ?></span>
-                        </div>
-                      </div>
-
-                      <div class="detail-section">
-                        <h4><i class="fas fa-building"></i> Informations entreprise</h4>
-                        <div class="detail-item"><span class="detail-label">Raison sociale:</span><span class="detail-value"><?= esc_html($client->raison_sociale) ?></span></div>
-                        <div class="detail-item"><span class="detail-label">Email entreprise:</span><span class="detail-value"><?= esc_html($client->email_entreprise ?? '-') ?></span></div>
-                        <div class="detail-item"><span class="detail-label">Tél. entreprise:</span><span class="detail-value"><?= esc_html($client->tel_entreprise ?? '-') ?></span></div>
-                        <div class="detail-item"><span class="detail-label">Site web:</span><span class="detail-value"><?= esc_html($client->site_web) ?></span></div>
-                      </div>
-
-                      <div class="detail-section">
-                        <h4><i class="fas fa-map-marker-alt"></i> Localisation</h4>
-                        <div class="detail-item"><span class="detail-label">Adresse:</span><span class="detail-value"><?= esc_html($client->adresse ?? '-') ?></span></div>
-                        <div class="detail-item"><span class="detail-label">Wilaya:</span><span class="detail-value"><?= esc_html($client->wilaya) ?></span></div>
-                        <div class="detail-item"><span class="detail-label">Commune:</span><span class="detail-value"><?= esc_html($client->commune ?? '-') ?></span></div>
-                      </div>
-
-                      <div class="detail-section">
-                        <h4><i class="fas fa-briefcase"></i> Activité & Juridique</h4>
-                        <div class="detail-item"><span class="detail-label">Type d'activité:</span><span class="detail-value"><?= esc_html($client->type_activite) ?></span></div>
-                        <div class="detail-item"><span class="detail-label">Forme juridique:</span><span class="detail-value"><?= esc_html($client->forme_juridique ?? '-') ?></span></div>
-                        <div class="detail-item"><span class="detail-label">Date début:</span><span class="detail-value"><?= esc_html($client->date_debut ?? '-') ?></span></div>
-                        <div class="detail-item"><span class="detail-label">N° Registre:</span><span class="detail-value"><?= esc_html($client->registre_commerce ?? '-') ?></span></div>
-                      </div>
-
-                      <div class="detail-section">
-                        <h4><i class="fas fa-university"></i> Informations bancaires</h4>
-                        <div class="detail-item"><span class="detail-label">Banque:</span><span class="detail-value"><?= esc_html($client->banque ?? '-') ?></span></div>
-                      </div>
-
-                      <div class="detail-section">
-                        <h4><i class="fas fa-file-alt"></i> Document & Statut</h4>
-                        <div class="detail-item">
-                          <span class="detail-label">Document:</span>
-                          <span class="detail-value">
-                            <?php if (!empty($client->document_url)): ?>
-                              <a href="<?= esc_url($client->document_url) ?>" class="document-link" target="_blank">
-                                <i class="fas fa-file-pdf"></i> Télécharger
-                              </a>
-                            <?php else: ?>
-                              <em>Aucun document</em>
-                            <?php endif; ?>
-                          </span>
-                        </div>
-                        <div class="detail-item">
-                          <span class="detail-label">Statut:</span>
-                          <span class="detail-value">
-                            <span class="status <?= $client->statut == 'validé' ? 'status-validated' : 'status-pending' ?>">
-                              <i class="fas fa-check-circle"></i> <?= ucfirst($client->statut) ?>
-                            </span>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Ajoute les autres sections ici de la même façon, en te basant sur les colonnes de ta base -->
-                  </div>
-      </div>
-      </td>
-      </tr>
-    <?php endforeach; ?>
-    </tbody>
-
-    </table>
-    </div>
-
-    <!-- Pagination -->
-    <div class="pagination">
-      <button class="pagination-btn" data-page="prev">
-        <i class="fas fa-chevron-left"></i>
-      </button>
-      <button class="pagination-btn active">1</button>
-      <button class="pagination-btn">2</button>
-      <button class="pagination-btn">3</button>
-      <button class="pagination-btn">4</button>
-      <button class="pagination-btn">5</button>
-      <button class="pagination-btn" data-page="next">
-        <i class="fas fa-chevron-right"></i>
-      </button>
-    </div>
-  </div>
-  </div>
-
-
-
-  <script>
-    // Fonction pour déplier/replier les détails
-    function toggleDetails(clientId) {
-      const detailsRow = document.getElementById(`details-${clientId}`);
-      const expandBtn = document.querySelector(
-        `tr[data-id="${clientId}"] .expand-btn`
-      );
-      const icon = expandBtn.querySelector("i");
-
-      if (detailsRow.classList.contains("expanded")) {
-        detailsRow.classList.remove("expanded");
-        expandBtn.classList.remove("expanded");
-        icon.style.transform = "rotate(0deg)";
-      } else {
-        // Fermer tous les autres détails ouverts
-        document.querySelectorAll(".details-row.expanded").forEach((row) => {
-          row.classList.remove("expanded");
-        });
-        document.querySelectorAll(".expand-btn.expanded").forEach((btn) => {
-          btn.classList.remove("expanded");
-          btn.querySelector("i").style.transform = "rotate(0deg)";
-        });
-
-        // Ouvrir les détails du client sélectionné
-        detailsRow.classList.add("expanded");
-        expandBtn.classList.add("expanded");
-        icon.style.transform = "rotate(180deg)";
-      }
-    }
-
-    function validateClient(clientId) {
-      if (confirm("Êtes-vous sûr de vouloir valider ce client ?")) {
-        const row = document.querySelector(`tr[data-id="${clientId}"]`);
-        const statusCell = row.querySelector(".status");
-        statusCell.innerHTML = '<i class="fas fa-check-circle"></i> Validé';
-        statusCell.className = "status status-validated";
-
-        // Mettre à jour les boutons d'action
-        const actionsCell = row.querySelector(".action-buttons");
-        actionsCell.innerHTML = `
-                    <button class="action-btn tooltip" style="background-color: var(--info-color);">
-                        <i class="fas fa-file-pdf"></i> Doc
-                        <span class="tooltip-text">Voir document</span>
-                    </button>
-                `;
-
-        // Mettre à jour le statut dans les détails si ils sont ouverts
-        const detailsRow = document.getElementById(`details-${clientId}`);
-        if (detailsRow && detailsRow.classList.contains("expanded")) {
-          const statusInDetails = detailsRow.querySelector(".status");
-          if (statusInDetails) {
-            statusInDetails.innerHTML =
-              '<i class="fas fa-check-circle"></i> Validé';
-            statusInDetails.className = "status status-validated";
-          }
-        }
-
-        alert("Client validé avec succès!");
-      }
-    }
-
-    function refuseClient(clientId) {
-      const reason = prompt("Raison du refus:");
-      if (reason) {
-        const row = document.querySelector(`tr[data-id="${clientId}"]`);
-        const statusCell = row.querySelector(".status");
-        statusCell.innerHTML = '<i class="fas fa-times-circle"></i> Refusé';
-        statusCell.className = "status status-refused";
-
-        // Mettre à jour les boutons d'action
-        const actionsCell = row.querySelector(".action-buttons");
-        actionsCell.innerHTML = `
-                    <button class="action-btn btn-validate" onclick="validateClient(${clientId})">
-                        <i class="fas fa-check"></i> Valider
-                    </button>
-                `;
-
-        // Mettre à jour le statut dans les détails si ils sont ouverts
-        const detailsRow = document.getElementById(`details-${clientId}`);
-        if (detailsRow && detailsRow.classList.contains("expanded")) {
-          const statusInDetails = detailsRow.querySelector(".status");
-          if (statusInDetails) {
-            statusInDetails.innerHTML =
-              '<i class="fas fa-times-circle"></i> Refusé';
-            statusInDetails.className = "status status-refused";
-          }
-        }
-
-        alert("Client refusé avec succès!");
-      }
-    }
-
-    function toggleBlock(clientId) {
-      const row = document.querySelector(`tr[data-id="${clientId}"]`);
-      const statusCell = row.querySelector(".status");
-      const isBlocked = statusCell.textContent.includes("Bloqué");
-
-      if (isBlocked) {
-        statusCell.innerHTML = '<i class="fas fa-check-circle"></i> Validé';
-        statusCell.className = "status status-validated";
-
-        // Mettre à jour le bouton
-        const actionsCell = row.querySelector(".action-buttons");
-        actionsCell.innerHTML = `
-                    <button class="action-btn tooltip" style="background-color: var(--info-color);">
-                        <i class="fas fa-file-pdf"></i> Doc
-                        <span class="tooltip-text">Voir document</span>
-                    </button>
-                `;
-
-        alert("Client débloqué avec succès!");
-      } else {
-        statusCell.innerHTML = '<i class="fas fa-ban"></i> Bloqué';
-        statusCell.className = "status status-blocked";
-
-        // Mettre à jour le bouton
-        const actionsCell = row.querySelector(".action-buttons");
-        actionsCell.innerHTML = `
-                    <button class="action-btn btn-toggle" onclick="toggleBlock(${clientId})">
-                        <i class="fas fa-unlock"></i> Débloquer
-                    </button>
-                `;
-
-        alert("Client bloqué avec succès!");
-      }
-
-      // Mettre à jour le statut dans les détails si ils sont ouverts
-      const detailsRow = document.getElementById(`details-${clientId}`);
-      if (detailsRow && detailsRow.classList.contains("expanded")) {
-        const statusInDetails = detailsRow.querySelector(".status");
-        if (statusInDetails) {
-          statusInDetails.innerHTML = statusCell.innerHTML;
-          statusInDetails.className = statusCell.className;
-        }
-      }
-    }
-
-    // Tri des colonnes
-    document
-      .querySelectorAll(".clients-table th[data-sort]")
-      .forEach((header) => {
-        header.addEventListener("click", function() {
-          const sortBy = this.getAttribute("data-sort");
-          const currentDirection =
-            this.getAttribute("data-direction") || "asc";
-          const newDirection = currentDirection === "asc" ? "desc" : "asc";
-
-          // Réinitialiser toutes les directions de tri
-          document
-            .querySelectorAll(".clients-table th[data-sort]")
-            .forEach((th) => {
-              th.removeAttribute("data-direction");
-              th.querySelector("i").className = "fas fa-sort";
-            });
-
-          // Définir la nouvelle direction de tri
-          this.setAttribute("data-direction", newDirection);
-          this.querySelector("i").className =
-            newDirection === "asc" ? "fas fa-sort-up" : "fas fa-sort-down";
-
-          alert(
-            `Tri par ${sortBy} en ordre ${
-                newDirection === "asc" ? "croissant" : "décroissant"
-              }`
-          );
-        });
-      });
-
-    // Filtres
-    document
-      .getElementById("apply-filters")
-      .addEventListener("click", function() {
-        const status = document.getElementById("status-filter").value;
-        const activity = document.getElementById("activity-filter").value;
-        const search = document.getElementById("search").value;
-
-        alert(
-          `Filtres appliqués:\nStatut: ${status || "Tous"}\nActivité: ${
-              activity || "Tous"
-            }\nRecherche: ${search || "Aucune"}`
-        );
-      });
-
-    document
-      .getElementById("reset-filters")
-      .addEventListener("click", function() {
-        document.getElementById("status-filter").value = "";
-        document.getElementById("activity-filter").value = "";
-        document.getElementById("search").value = "";
-        alert("Filtres réinitialisés");
-      });
-
-    // Export CSV
-    document
-      .getElementById("export-csv")
-      .addEventListener("click", function() {
-        alert("Export CSV en cours...");
-      });
-
-    // Pagination
-    document.querySelectorAll(".pagination-btn").forEach((button) => {
-      if (!button.hasAttribute("data-page")) {
-        button.addEventListener("click", function() {
-          document.querySelectorAll(".pagination-btn").forEach((btn) => {
-            btn.classList.remove("active");
-          });
-          this.classList.add("active");
-          alert(`Page ${this.textContent} chargée`);
-        });
-      }
-    });
-
-
-
-    // Fermer tous les détails ouverts quand on clique ailleurs
-    document.addEventListener("click", function(event) {
-      if (
-        !event.target.closest(".expand-btn") &&
-        !event.target.closest(".details-row")
-      ) {
-        // Optionnel: fermer automatiquement les détails ouverts
-        // Commenté pour permettre de garder les détails ouverts
-        /*
-              document.querySelectorAll('.details-row.expanded').forEach(row => {
-                  row.classList.remove('expanded');
-              });
-              document.querySelectorAll('.expand-btn.expanded').forEach(btn => {
-                  btn.classList.remove('expanded');
-                  btn.querySelector('i').style.transform = 'rotate(0deg)';
-              });
-              */
-      }
-    });
-  </script>
 </body>
 
 </html>

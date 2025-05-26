@@ -213,3 +213,22 @@ add_action('rest_api_init', function () {
         'permission_callback' => '__return_true',
     ]);
 });
+
+
+//Activer ou desactiver un compte client
+add_action('rest_api_init', function () {
+    register_rest_route('sefarpay/v1', '/toggle-status', [
+        'methods' => 'POST',
+        'callback' => 'sefarpay_toggle_status',
+        'permission_callback' => '__return_true',
+    ]);
+});
+
+function sefarpay_toggle_status(WP_REST_Request $request)
+{
+    global $wpdb;
+    $id = intval($request['id']);
+    $statut = in_array($request['actif'], ['Actif', 'Inactif']) ? $request['actif'] : 'Inactif';
+    $wpdb->update($wpdb->prefix . 'sefarpay_clients', ['statut' => $statut], ['id' => $id]);
+    return rest_ensure_response(['updated' => true]);
+}

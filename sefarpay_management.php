@@ -15,6 +15,7 @@ require_once SEFARPAY_MANAGEMENT_PATH . 'admin/sefarpay-management-admin-menu.ph
 require_once SEFARPAY_MANAGEMENT_PATH . 'admin/sefarpay-management-install.php';
 require_once SEFARPAY_MANAGEMENT_PATH . 'api.php';  // <-- Ajout ici
 
+
 // Notification à l’activation
 function sefarpay_management_activation_notice()
 {

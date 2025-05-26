@@ -31,7 +31,7 @@ function sefarpay_management_create_tables()
         telephone_societe VARCHAR(20) NOT NULL,
         numero_registre VARCHAR(50) NOT NULL,
         registre_document_url VARCHAR(255) NOT NULL,
-        statut VARCHAR(20) NOT NULL DEFAULT 'inactif',
+        statut VARCHAR(20) NOT NULL DEFAULT 'Inactif',
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
     ) $charset_collate;";
