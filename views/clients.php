@@ -943,9 +943,38 @@
                 </td>
                 <td>
                   <label class="switch">
-                    <input type="checkbox" <?= $client->statut = 'actif' ? 'checked' : '' ?> />
+                    <input type="checkbox"
+                      class="toggle-client-status"
+                      data-id="<?= esc_attr($client->id) ?>"
+                      <?= $client->statut === 'actif' ? 'checked' : '' ?> />
                     <span class="slider"></span>
                   </label>
+
+                  <script>
+                    jQuery(document).ready(function($) {
+                      $('.toggle-client-status').on('change', function() {
+                        const clientId = $(this).data('id');
+                        const isChecked = $(this).is(':checked');
+                        const action = isChecked ? 'activer_client' : 'desactiver_client';
+
+                        $.ajax({
+                          url: ajaxurl,
+                          method: 'POST',
+                          data: {
+                            action: action,
+                            client_id: clientId
+                          },
+                          success: function(response) {
+                            console.log(response.message);
+                          },
+                          error: function() {
+                            alert('Une erreur est survenue.');
+                          }
+                        });
+                      });
+                    });
+                  </script>
+
                 </td>
                 <td>
                   <div class="action-buttons">
@@ -1278,16 +1307,7 @@
       }
     });
 
-    // Gestion des switches d'activation
-    document.querySelectorAll(".switch input").forEach((switchInput) => {
-      switchInput.addEventListener("change", function() {
-        const row = this.closest("tr");
-        const clientId = row.getAttribute("data-id");
-        const isActive = this.checked;
 
-        alert(`Client ${clientId} ${isActive ? "activé" : "désactivé"}`);
-      });
-    });
 
     // Fermer tous les détails ouverts quand on clique ailleurs
     document.addEventListener("click", function(event) {

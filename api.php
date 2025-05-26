@@ -140,7 +140,8 @@ function sefarpay_register_payment(WP_REST_Request $request)
         'code_action'         => sanitize_text_field($data['code_action'] ?? ''),
         'description_action'  => sanitize_text_field($data['description_action'] ?? ''),
         'etat_paiement'       => sanitize_text_field($data['etat_paiement'] ?? ''),
-        'description'         => sanitize_text_field($data['description'] ?? '')
+        'description'         => sanitize_text_field($data['description'] ?? ''),
+        'transaction_satim_id' => sanitize_text_field($data['transaction_satim_id'] ?? '')
     ];
 
     $inserted = $wpdb->insert($table, $sanitized_data);
@@ -176,6 +177,39 @@ add_action('rest_api_init', function () {
     register_rest_route('sefarpay_management/v1', '/new-payment', [
         'methods' => 'POST',
         'callback' => 'sefarpay_register_payment',
+        'permission_callback' => '__return_true',
+    ]);
+});
+
+// Fonction pour récupérer le statut d'un client
+function sefarpay_get_client_status(WP_REST_Request $request)
+{
+    global $wpdb;
+    $sefarpay_id = $request->get_param('sefarpay_id');
+
+    if (empty($sefarpay_id)) {
+        return new WP_REST_Response('Paramètre manquant', 400);
+    }
+
+    $table = $wpdb->prefix . 'sefarpay_clients';
+
+    $client = $wpdb->get_var(
+        $wpdb->prepare("SELECT statut FROM $table WHERE id = %d", intval($sefarpay_id))
+    );
+
+    if (is_null($client)) {
+        return new WP_REST_Response('Client non trouvé', 404);
+    }
+
+    return new WP_REST_Response($client, 200);
+}
+
+
+// Déclaration de l’endpoint REST
+add_action('rest_api_init', function () {
+    register_rest_route('sefarpay_management/v1', '/account_status', [
+        'methods' => 'GET',
+        'callback' => 'sefarpay_get_client_status',
         'permission_callback' => '__return_true',
     ]);
 });
